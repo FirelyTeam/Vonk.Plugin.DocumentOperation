@@ -1,6 +1,7 @@
 # $document operation for Vonk FHIR server
 
-This repository implements a plug-in for the Vonk FHIR server [(vonk.fire.ly)](vonk.fire.ly). It provides the $document operation defined by the FHIR standard. For more information see [[1]](https://www.hl7.org/fhir/operation-composition-document.html).
+This repository implements a plug-in for the Vonk FHIR server [(vonk.fire.ly)](vonk.fire.ly).<br>
+It provides the $document operation defined by the FHIR standard. For more information see [[1]](https://www.hl7.org/fhir/operation-composition-document.html).
 
 ## Getting Started
 
