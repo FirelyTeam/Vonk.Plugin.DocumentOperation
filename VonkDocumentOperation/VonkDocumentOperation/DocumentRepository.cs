@@ -2,22 +2,16 @@
 using System.Threading.Tasks;
 using Vonk.Core.Context;
 using Vonk.Core.Context.Features;
-using Vonk.Core.Repository;
+using Vonk.Core.Pluggability;
 
 namespace VonkDocumentOperation
 {
-    public class DocumentRepository : ISearchRepository
+    public class DocumentRepository
     {
-        public DocumentRepository()
+        [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "GET")]
+        public void document(IVonkContext context)
         {
-        }
-
-        public Task<SearchResult> Search(IArgumentCollection arguments, SearchOptions options)
-        {
-            foreach(var argument in arguments){
-                Console.WriteLine(argument);
-            }
-            return null;
+            Console.WriteLine("GET $document was called!");
         }
     }
 }

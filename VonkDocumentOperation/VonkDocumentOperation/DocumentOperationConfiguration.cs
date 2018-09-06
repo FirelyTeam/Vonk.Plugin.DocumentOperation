@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Vonk.Core.Context.Features;
@@ -13,13 +14,14 @@ namespace VonkDocumentOperation
         // Add services here to the DI system of ASP.NET Core
         public static IServiceCollection ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<ISearchRepository, DocumentRepository>(); // Implements the interface for a FHIR READ operation
+            services.AddScoped<DocumentRepository>(); // $document implementation
             return services;
         }
 
+        // Add middleware to the pipeline being built with the builder
         public static IApplicationBuilder Configure(IApplicationBuilder builder)
         {
-            //add middleware to the pipeline being built with the builder
+            builder.UseVonkInteraction<DocumentRepository>((svc, context) => svc.document(context)); // Register interaction
             return builder;
         }
     }
