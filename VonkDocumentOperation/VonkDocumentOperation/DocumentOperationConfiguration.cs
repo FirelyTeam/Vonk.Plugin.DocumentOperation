@@ -19,10 +19,10 @@ namespace VonkDocumentOperation
         public static IApplicationBuilder Configure(IApplicationBuilder builder)
         {
             // Register interactions
-            builder.UseVonkInteraction<DocumentRepository>((svc, context) => svc.documentTypeGET(context));
-            builder.UseVonkInteraction<DocumentRepository>((svc, context) => svc.documentTypePOST(context));
-            builder.UseVonkInteraction<DocumentRepository>((svc, context) => svc.documentInstanceGET(context));
-            builder.UseVonkInteraction<DocumentRepository>((svc, context) => svc.documentInstancePOST(context));
+            builder.UseVonkInteraction<DocumentRepository>((doc, context) => doc.documentTypeGET(context), OperationType.Handler);
+            builder.UseVonkInteraction<DocumentRepository>((doc, context) => doc.documentTypePOST(context), OperationType.Handler);
+            builder.UseVonkInteraction<DocumentRepository>((doc, context) => doc.documentInstanceGET(context), OperationType.Handler);
+            builder.UseVonkInteraction<DocumentRepository>((doc, context) => doc.documentInstancePOST(context), OperationType.Handler);
             return builder;
         }
     }
