@@ -71,18 +71,16 @@ namespace VonkDocumentOperation
             SearchOptions options = SearchOptions.LatestOne(context.ServerBase);
             SearchResult searchResult = await searchRepository.Search(searchArguments, options);
 
-            // Get references in Compsoition resource
+            // Include Composition resource in search results
             if (searchResult.TotalCount > 0){
-                IResource composition = searchResult.First<IResource>();
-                Console.WriteLine("Found requested resource: " 
-                                  + searchArguments.GetArgument("_type").ArgumentValue 
-                                  + "/" 
-                                  + searchArguments.GetArgument("_id").ArgumentValue);
+                IResource abstarctCompositionResource = searchResult.First<IResource>();
+                Resource compositionResource = ((PocoResource)abstarctCompositionResource).InnerResource;
+                bundle.AddSearchEntry(compositionResource, "", Bundle.SearchEntryMode.Match);
             }
 
             // Return newly created document
             IVonkResponse response = context.Response;
-            response.Payload = (IResource) new PocoResource(bundle);
+            response.Payload = new PocoResource(bundle);
             response.HttpResult = 200;
             string bundleLocation = baseURL + "Bundle/" + bundle.Id;
             response.Headers.Add(VonkResultHeader.Location, bundleLocation);
