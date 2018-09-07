@@ -26,7 +26,6 @@ Currently the following limitations exist in the implemenation:
 * The $document operation is not working correctly on a type level
 * The $document operation is not working correctly when called on a composition resource with a given versionId
 * No digital signature is added on the created document
-* Composition resource is not included in the returned search bundle
 * Additional resources are not included in the returned search bundle
 
 ## Tests
