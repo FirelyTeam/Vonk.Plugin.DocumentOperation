@@ -8,6 +8,7 @@ using Vonk.Core.Common;
 using Vonk.Core.Repository;
 using System.Linq;
 using Task = System.Threading.Tasks.Task;
+using Hl7.FhirPath;
 
 namespace VonkDocumentOperation
 {
@@ -74,10 +75,22 @@ namespace VonkDocumentOperation
 
             // Include Composition resource in search results
             if (searchResult.TotalCount > 0){
-                IResource abstarctCompositionResource = searchResult.First<IResource>();
-                Resource compositionResource = ((PocoResource)abstarctCompositionResource).InnerResource;
+                searchBundle.Total = searchResult.TotalCount;
+                IResource abstractCompositionResource = searchResult.First<IResource>();
+                Resource compositionResource = ((PocoResource)abstractCompositionResource).InnerResource;
                 var compositionResourceLocation = fhirBaseURL + "Composition/" + requestedCompositionID;
                 searchBundle.AddSearchEntry(compositionResource, compositionResourceLocation, Bundle.SearchEntryMode.Match);
+
+                // Get all references in the Composition
+                var allReferencesInResourceQuery = "Composition.descendants().where($this is Reference).reference";
+                var entries = abstractCompositionResource.Navigator.Select(allReferencesInResourceQuery);
+                foreach(var entry in entries)
+                {
+                    Console.WriteLine(entry.Location + " : " + entry.Value);
+                }
+            }
+            else{
+                searchBundle.Total = 0;
             }
 
             // Return newly created document
@@ -92,7 +105,6 @@ namespace VonkDocumentOperation
             var bundle = new Bundle();
             bundle.Id = Guid.NewGuid().ToString();
             bundle.Type = Bundle.BundleType.Searchset;
-            bundle.Total = 1;
             bundle.Meta = new Meta()
             {
                 LastUpdatedElement = Instant.Now()
