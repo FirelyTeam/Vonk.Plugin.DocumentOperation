@@ -61,29 +61,29 @@ namespace VonkDocumentOperation
         public async Task document(IVonkContext context)
         {
             // Build (basic) search bundle
-            var path = context.Request.Path;
-            var baseURL = context.ServerBase.ToString();
-            var bundle = createBasicBundle(baseURL, path);
+            var requestPath = context.Request.Path;
+            var fhirBaseURL = context.ServerBase.ToString();
+            var searchBundle = createBasicBundle(fhirBaseURL, requestPath);
+            string searchBundleLocation = fhirBaseURL + "Bundle/" + searchBundle.Id;
 
             // Get Composition resource
-            var compositionID = context.Arguments.GetArgument("_id").ArgumentValue;
-            var searchArguments = compositionSearchArguments(compositionID);
-            SearchOptions options = SearchOptions.LatestOne(context.ServerBase);
-            SearchResult searchResult = await searchRepository.Search(searchArguments, options);
+            var requestedCompositionID = context.Arguments.GetArgument("_id").ArgumentValue;
+            var searchArguments = compositionSearchArguments(requestedCompositionID);
+            SearchOptions searchOptions = SearchOptions.LatestOne(context.ServerBase);
+            SearchResult searchResult = await searchRepository.Search(searchArguments, searchOptions);
 
             // Include Composition resource in search results
             if (searchResult.TotalCount > 0){
                 IResource abstarctCompositionResource = searchResult.First<IResource>();
                 Resource compositionResource = ((PocoResource)abstarctCompositionResource).InnerResource;
-                bundle.AddSearchEntry(compositionResource, "", Bundle.SearchEntryMode.Match);
+                searchBundle.AddSearchEntry(compositionResource, "", Bundle.SearchEntryMode.Match);
             }
 
             // Return newly created document
             IVonkResponse response = context.Response;
-            response.Payload = new PocoResource(bundle);
+            response.Payload = new PocoResource(searchBundle);
             response.HttpResult = 200;
-            string bundleLocation = baseURL + "Bundle/" + bundle.Id;
-            response.Headers.Add(VonkResultHeader.Location, bundleLocation);
+            response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
         }
 
         private Bundle createBasicBundle(string baseURL, string path)
