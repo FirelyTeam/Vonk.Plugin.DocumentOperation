@@ -76,7 +76,8 @@ namespace VonkDocumentOperation
             if (searchResult.TotalCount > 0){
                 IResource abstarctCompositionResource = searchResult.First<IResource>();
                 Resource compositionResource = ((PocoResource)abstarctCompositionResource).InnerResource;
-                searchBundle.AddSearchEntry(compositionResource, "", Bundle.SearchEntryMode.Match);
+                var compositionResourceLocation = fhirBaseURL + "Composition/" + requestedCompositionID;
+                searchBundle.AddSearchEntry(compositionResource, compositionResourceLocation, Bundle.SearchEntryMode.Match);
             }
 
             // Return newly created document
