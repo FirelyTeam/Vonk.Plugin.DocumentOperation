@@ -24,9 +24,9 @@ The following configuration has been succesfully tested for building and running
 
 Currently the following limitations exist in the implemenation:
 * The $document operation is not working correctly on a type level
-* The $document operation is not working correctly when called on a composition resource with a given versionId
+* The $document operation is not rejected when called on a composition resource with a given versionId
 * No digital signature is added on the created document
-* Additional resources are not included in the returned search bundle
+* Absolute resources are not included in a document
 
 ## Tests
 
@@ -37,10 +37,6 @@ The $document operation is defined in FHIR for multiple interactions:
 
 * Instance level interaction:<br>
     > [base]/Composition/[id]/$document
-
-* Instance level interaction (Version-specific):<br>
-    > [base]/Composition/[id]/_history/[vid]/$document
-
 
 ## License
 
