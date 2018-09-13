@@ -7,8 +7,12 @@ using Vonk.Core.Pluggability;
 using Vonk.Core.Common;
 using Vonk.Core.Repository;
 using System.Linq;
-using Task = System.Threading.Tasks.Task;
 using Hl7.FhirPath;
+using Hl7.Fhir.ElementModel;
+using System.Collections.Generic;
+using Hl7.Fhir.Support;
+using static Hl7.Fhir.Model.OperationOutcome;
+using Task = System.Threading.Tasks.Task;
 
 namespace VonkDocumentOperation
 {
