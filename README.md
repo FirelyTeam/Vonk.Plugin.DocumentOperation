@@ -24,9 +24,9 @@ The following configuration has been succesfully tested for building and running
 
 Currently the following limitations exist in the implemenation:
 * The $document operation is not working correctly on a type level
-* The $document operation is not rejected when called on a composition resource with a given versionId
 * No digital signature is added on the created document
-* Absolute resources are not included in a document
+* Absolute (remote) references are not included in a document
+* Misleading OperationOutcome is returned for absolute (remote) references
 
 ## Tests
 
