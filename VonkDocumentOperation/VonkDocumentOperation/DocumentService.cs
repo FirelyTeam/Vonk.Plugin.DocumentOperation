@@ -16,36 +16,39 @@ namespace VonkDocumentOperation
     {
 
         private ISearchRepository searchRepository;
+        private IResourceChangeRepository changeRepository;
 
-        public DocumentRepository(ISearchRepository searchRepsoitory){
+        public DocumentRepository(ISearchRepository searchRepsoitory, IResourceChangeRepository changeRepository)
+        {
             this.searchRepository = searchRepsoitory;
+            this.changeRepository = changeRepository;
         }
 
         [InteractionHandler(VonkInteraction.type_custom, CustomOperation = "document", Method = "GET", AcceptedTypes = new string[] { "Composition" })]
-        public void documentTypeGET(IVonkContext context)
+        public void DocumentTypeGET(IVonkContext context)
         {
-            Task createDocument = document(context);
-            createDocument.Wait();
-        }
-
-        [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "GET", AcceptedTypes = new string[] { "Composition" })]
-        public void documentInstanceGET(IVonkContext context)
-        {
-            Task createDocument = document(context);
-            createDocument.Wait();
+            OperationNotImplemented(context.Response);
+            context.Arguments.Handled();
         }
 
         [InteractionHandler(VonkInteraction.type_custom, CustomOperation = "document", Method = "POST", AcceptedTypes = new string[] { "Composition" })]
-        public void documentTypePOST(IVonkContext context)
+        public void DocumentTypePOST(IVonkContext context)
         {
-            Task createDocument = document(context);
+            OperationNotImplemented(context.Response);
+            context.Arguments.Handled();
+        }
+
+        [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "GET", AcceptedTypes = new string[] { "Composition" })]
+        public void DocumentInstanceGET(IVonkContext context)
+        {
+            Task createDocument = Document(context);
             createDocument.Wait();
         }
 
         [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "POST", AcceptedTypes = new string[] { "Composition" })]
-        public void documentInstancePOST(IVonkContext context)
+        public void DocumentInstancePOST(IVonkContext context)
         {
-            Task createDocument = document(context);
+            Task createDocument = Document(context);
             createDocument.Wait();
         }
 
