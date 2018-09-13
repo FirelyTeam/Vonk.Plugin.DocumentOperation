@@ -117,7 +117,7 @@ namespace VonkDocumentOperation
                 No depth-related limitations.
 
                 Input parameters:
-                    - startResource: Resource potentially contains references that need to be included in the document
+                    - startResource: First resource which potentially contains references that need to be included in the document
                     - searchBundle: FHIR Search Bundle to which the resolved resources shall be added as includes
                     - localBaseURL: Base URL of the current Vonk instance - Needed Internally
 
