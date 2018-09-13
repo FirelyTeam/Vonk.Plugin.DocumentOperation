@@ -132,5 +132,40 @@ namespace VonkDocumentOperation
 
             return arguments;
         }
+
+        /* Helper - Return response */
+
+        private void SendCreatedDocument(string fhirBaseURL, IVonkResponse response, Bundle searchBundle)
+        {
+            response.Payload = new PocoResource(searchBundle);
+            response.HttpResult = 200;
+            string searchBundleLocation = fhirBaseURL + "Bundle/" + searchBundle.Id;
+            response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
+        }
+
+        private void CancelDocumentOperation(IVonkResponse response, IssueComponent issue)
+        {
+            response.Payload = null;
+            response.HttpResult = 500;
+            response.Outcome.AddIssue(issue);
+        }
+
+        private IssueComponent LocalReferenceNotResolvedIssue(string failedReference)
+        {
+            var issue = new OperationOutcome.IssueComponent()
+            {
+                Severity = OperationOutcome.IssueSeverity.Error
+            };
+            issue.Code = IssueType.NotFound;
+            issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference);
+            return issue;
+        }
+
+        private void OperationNotImplemented(IVonkResponse response)
+        {
+            response.Payload = null;
+            response.HttpResult = 501;
+        }
+
     }
 }
