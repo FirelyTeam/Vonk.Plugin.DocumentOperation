@@ -100,7 +100,13 @@ namespace VonkDocumentOperation
                 searchBundle.Total = 0;
             }
 
-            // Return newly created document
+            // Check if we need to persist the bundle
+            var userRequestedPersistOption = context.Arguments.GetArgument("persist").ArgumentValue;
+            if (userRequestedPersistOption.Equals("true"))
+            {
+                await changeRepository.Create(new PocoResource(searchBundle));
+            }
+
             // Handle responses
             IVonkResponse response = context.Response;
             context.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
