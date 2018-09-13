@@ -119,7 +119,9 @@ namespace VonkDocumentOperation
             SendCreatedDocument(localBaseURL, response, searchBundle); // Return newly created document
         }
 
-        private Bundle createBasicBundle(string baseURL, string path)
+        /* Helper - Bundle-related */
+
+        private Bundle CreateBasicBundle(string localBaseURL, string operationRequestPath)
         {
             var bundle = new Bundle();
             bundle.Id = Guid.NewGuid().ToString();
@@ -128,21 +130,58 @@ namespace VonkDocumentOperation
             {
                 LastUpdatedElement = Instant.Now()
             };
-            bundle.SelfLink = buildSelfBundleLink(baseURL, path);
+
+            localBaseURL = localBaseURL.TrimEnd('/'); // FHIR Base URLs should not contain a "/" at the end
+            bundle.SelfLink = new Uri(localBaseURL + operationRequestPath, UriKind.Absolute);
             return bundle;
         }
 
-        private Uri buildSelfBundleLink(string baseURL, string path)
+        /* Helper - Resolve resources */
+
+        private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveResource(string id, string type, string localBaseURL)
         {
-            baseURL = baseURL.TrimEnd('/'); // Trim trailling '/', it is already included in the path
-            return new Uri(baseURL + path, UriKind.Absolute);
+            return await ResolveResource(type + "/" + id, localBaseURL);
         }
 
-        private IArgumentCollection compositionSearchArguments(string compositionID)
+        private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveResource(string reference, string localBaseURL)
         {
+            if (Uri.IsWellFormedUriString(reference, UriKind.Relative))
+            {
+                (bool successfulResolve, Resource resource, string failedReference) = await ResolveLocalResource(reference, localBaseURL);
+                return (successfulResolve, resource, failedReference);
+            }
+            else
+            {
+                // Server chooses not to handle absolute (remote) references
+                return (false, null, reference);
+            }
+        }
+
+        private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveLocalResource(string reference, string localBaseURL)
+        {
+            SearchOptions searchOptions = SearchOptions.LatestOne(new Uri(localBaseURL));
+            var searchArguments = BuildSearchArguments(reference);
+            SearchResult searchResult = await searchRepository.Search(searchArguments, searchOptions);
+            if (searchResult.TotalCount > 0)
+            {
+                var resourceLocation = localBaseURL + reference;
+                var resource = ((PocoResource)searchResult.First<IResource>()).InnerResource;
+                return (true, resource, "");
+            }
+            return (false, null, reference);
+        }
+
+        private IArgumentCollection BuildSearchArguments(string reference)
+        {
+            // Split reference
+            var referenceParts = reference.Split('/', 2);
+            var type = referenceParts[0];
+            var id = referenceParts[1];
+
+            // Build search arguments
             ArgumentCollection arguments = new ArgumentCollection();
-            Argument typeArgument = new Argument(ArgumentSource.Query, "_type", "Composition");
-            Argument idArgument = new Argument(ArgumentSource.Query, "_id", compositionID);
+            Argument typeArgument = new Argument(ArgumentSource.Query, "_type", type);
+            Argument idArgument = new Argument(ArgumentSource.Query, "_id", id);
             arguments.AddArgument(typeArgument);
             arguments.AddArgument(idArgument);
 
