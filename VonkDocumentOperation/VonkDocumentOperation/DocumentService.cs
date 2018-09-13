@@ -101,10 +101,16 @@ namespace VonkDocumentOperation
             }
 
             // Return newly created document
+            // Handle responses
             IVonkResponse response = context.Response;
-            response.Payload = new PocoResource(searchBundle);
-            response.HttpResult = 200;
-            response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
+            context.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
+            if (!allReferencesIncluded)
+            {
+                CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference));
+                return;
+            }
+
+            SendCreatedDocument(localBaseURL, response, searchBundle); // Return newly created document
         }
 
         private Bundle createBasicBundle(string baseURL, string path)
