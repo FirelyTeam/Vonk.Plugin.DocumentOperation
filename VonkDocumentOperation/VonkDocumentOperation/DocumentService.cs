@@ -75,17 +75,16 @@ namespace VonkDocumentOperation
 
             // Get Composition resource
             var compositionID = context.Arguments.GetArgument("_id").ArgumentValue;
-            (bool successfulResolve, Resource resolvedResource, string resourceLocation) = await ResolveResource(compositionID, "Composition", localBaseURL);
+            (bool allResourceResolved, Resource resolvedResource, string failedReference) = await ResolveResource(compositionID, "Composition", localBaseURL);
 
-            (bool allReferencesIncluded, string failedReference) = (true, "");
-            if (successfulResolve)
+            if (allResourceResolved)
             {
                 // Include Composition resource in search results
                 searchBundle.Total = 1;
-                searchBundle.AddSearchEntry(resolvedResource, resourceLocation, Bundle.SearchEntryMode.Match);
+                searchBundle.AddSearchEntry(resolvedResource, "Composition/" + compositionID, Bundle.SearchEntryMode.Match);
 
                 // Recursively resolve and include all references in the search bundle
-                (allReferencesIncluded, failedReference) = await IncludeReferencesInBundle(resolvedResource, searchBundle, localBaseURL);
+                (allResourceResolved, failedReference) = await IncludeReferencesInBundle(resolvedResource, searchBundle, localBaseURL);
             }
             else  // Composition resource, on which the operation is called, does not exist
             {
@@ -102,7 +101,7 @@ namespace VonkDocumentOperation
             // Handle responses
             IVonkResponse response = context.Response;
             context.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
-            if (!allReferencesIncluded)
+            if (!allResourceResolved)
             {
                 CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference));
                 return;
@@ -160,7 +159,7 @@ namespace VonkDocumentOperation
                 {
                     (successfulResolve, resolvedResource, failedReference) = await ResolveResource(referenceValue, localBaseURL);
                     if(successfulResolve){
-                        searchBundle.AddSearchEntry(resolvedResource, localBaseURL + referenceValue, Bundle.SearchEntryMode.Include);
+                        searchBundle.AddSearchEntry(resolvedResource, referenceValue, Bundle.SearchEntryMode.Include);
                         includedReferences.Add(referenceValue);
                     }
                     else{
@@ -222,7 +221,6 @@ namespace VonkDocumentOperation
             SearchResult searchResult = await searchRepository.Search(searchArguments, searchOptions);
             if (searchResult.TotalCount > 0)
             {
-                var resourceLocation = localBaseURL + reference;
                 var resource = ((PocoResource)searchResult.First<IResource>()).InnerResource;
                 return (true, resource, "");
             }
