@@ -66,37 +66,29 @@ namespace VonkDocumentOperation
             Only a single composition resource is currently considered (the resource upon which $document is called).
             </remarks>
         */
-        public async Task document(IVonkContext context)
+        public async Task Document(IVonkContext context)
         {
             // Build (basic) search bundle
-            var requestPath = context.Request.Path;
-            var fhirBaseURL = context.ServerBase.ToString();
-            var searchBundle = createBasicBundle(fhirBaseURL, requestPath);
-            string searchBundleLocation = fhirBaseURL + "Bundle/" + searchBundle.Id;
+            var operationRequestPath = context.Request.Path;
+            var localBaseURL = context.ServerBase.ToString();
+            var searchBundle = CreateBasicBundle(localBaseURL, operationRequestPath);
 
             // Get Composition resource
-            var requestedCompositionID = context.Arguments.GetArgument("_id").ArgumentValue;
-            var searchArguments = compositionSearchArguments(requestedCompositionID);
-            SearchOptions searchOptions = SearchOptions.LatestOne(context.ServerBase);
-            SearchResult searchResult = await searchRepository.Search(searchArguments, searchOptions);
+            var compositionID = context.Arguments.GetArgument("_id").ArgumentValue;
+            (bool successfulResolve, Resource resolvedResource, string resourceLocation) = await ResolveResource(compositionID, "Composition", localBaseURL);
 
-            // Include Composition resource in search results
-            if (searchResult.TotalCount > 0){
-                searchBundle.Total = searchResult.TotalCount;
-                IResource abstractCompositionResource = searchResult.First<IResource>();
-                Resource compositionResource = ((PocoResource)abstractCompositionResource).InnerResource;
-                var compositionResourceLocation = fhirBaseURL + "Composition/" + requestedCompositionID;
-                searchBundle.AddSearchEntry(compositionResource, compositionResourceLocation, Bundle.SearchEntryMode.Match);
+            (bool allReferencesIncluded, string failedReference) = (true, "");
+            if (successfulResolve)
+            {
+                // Include Composition resource in search results
+                searchBundle.Total = 1;
+                searchBundle.AddSearchEntry(resolvedResource, resourceLocation, Bundle.SearchEntryMode.Match);
 
-                // Get all references in the Composition
-                var allReferencesInResourceQuery = "Composition.descendants().where($this is Reference).reference";
-                var entries = abstractCompositionResource.Navigator.Select(allReferencesInResourceQuery);
-                foreach(var entry in entries)
-                {
-                    Console.WriteLine(entry.Location + " : " + entry.Value);
-                }
+                // Recursively resolve and include all references in the search bundle
+                (allReferencesIncluded, failedReference) = await IncludeReferencesInBundle(resolvedResource, searchBundle, localBaseURL);
             }
-            else{
+            else  // Composition resource, on which the operation is called, does not exist
+            {
                 searchBundle.Total = 0;
             }
 
@@ -117,6 +109,72 @@ namespace VonkDocumentOperation
             }
 
             SendCreatedDocument(localBaseURL, response, searchBundle); // Return newly created document
+        }
+
+        /*
+            <summary>
+                Include all resources found through references in a resource in a search bundle. 
+                This function traverses recursively through all references until no new references are found.
+                No depth-related limitations.
+
+                Input parameters:
+                    - startResource: Resource potentially contains references that need to be included in the document
+                    - searchBundle: FHIR Search Bundle to which the resolved resources shall be added as includes
+                    - localBaseURL: Base URL of the current Vonk instance - Needed Internally
+
+                Output parameters:
+                    - success describes if all references could recursively be found, starting from the given resource
+                    - failedReference contains the first reference that could not be resolved, empty if all resources can be resolved
+            </summary>
+        */
+        private async Task<(bool success, string failedReference)> IncludeReferencesInBundle(Resource startResource, Bundle searchBundle, string localBaseURL)
+        {
+            var includedReferences = new HashSet<string>();
+            return await IncludeReferencesInBundle(startResource, searchBundle, localBaseURL, includedReferences);
+        }
+
+        /*
+            <summary>
+                Overloaded method.
+                Input parameters:
+                    - includedReferences: Remember which resources were already added to the search bundle
+            </summary>
+        */
+        private async Task<(bool success, string failedReference)> IncludeReferencesInBundle(Resource resource, Bundle searchBundle, string localBaseURL, HashSet<string> includedReferences)
+        {
+            // Get references of given resource
+            var navigator = new PocoNavigator(resource);
+            var resourceType = navigator.Location; // The first location of a navigator is the resourceType
+            var allReferencesInResourceQuery = resourceType + ".descendants().where($this is Reference).reference";
+            var references = navigator.Select(allReferencesInResourceQuery);
+
+            // Resolve references
+            // Skip resources: 
+            //    - Contained resources as they are already included through their parents
+            //    - Resources that are already included in the search bundle
+            (bool successfulResolve, Resource resolvedResource, string failedReference) = (true, null, "");
+            foreach (var reference in references)
+            {
+                var referenceValue = reference.Value.ToString();
+                if (!referenceValue.StartsWith("#", StringComparison.Ordinal) && !includedReferences.Contains(referenceValue))
+                {
+                    (successfulResolve, resolvedResource, failedReference) = await ResolveResource(referenceValue, localBaseURL);
+                    if(successfulResolve){
+                        searchBundle.AddSearchEntry(resolvedResource, localBaseURL + referenceValue, Bundle.SearchEntryMode.Include);
+                        includedReferences.Add(referenceValue);
+                    }
+                    else{
+                        break;
+                    }
+
+                    // Recursively resolve all references in the included resource
+                    (successfulResolve, failedReference) = await IncludeReferencesInBundle(resolvedResource, searchBundle, localBaseURL, includedReferences);
+                    if(!successfulResolve){
+                        break;
+                    }
+                }
+            }
+            return (successfulResolve, failedReference);
         }
 
         /* Helper - Bundle-related */
