@@ -71,7 +71,7 @@ namespace VonkDocumentOperation
             // Build (basic) search bundle
             var operationRequestPath = context.Request.Path;
             var localBaseURL = context.ServerBase.ToString();
-            var searchBundle = CreateBasicBundle(localBaseURL, operationRequestPath);
+            var searchBundle = CreateEmptyBundle(localBaseURL, operationRequestPath);
 
             // Get Composition resource
             var compositionID = context.Arguments.GetArgument("_id").ArgumentValue;
@@ -178,7 +178,7 @@ namespace VonkDocumentOperation
 
         /* Helper - Bundle-related */
 
-        private Bundle CreateBasicBundle(string localBaseURL, string operationRequestPath)
+        private Bundle CreateEmptyBundle(string localBaseURL, string operationRequestPath)
         {
             var bundle = new Bundle();
             bundle.Id = Guid.NewGuid().ToString();
