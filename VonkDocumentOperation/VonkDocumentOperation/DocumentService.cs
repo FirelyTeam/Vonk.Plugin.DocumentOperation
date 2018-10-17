@@ -43,17 +43,15 @@ namespace VonkDocumentOperation
         }
 
         [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "GET", AcceptedTypes = new string[] { "Composition" })]
-        public void DocumentInstanceGET(IVonkContext context)
+        public async Task DocumentInstanceGET(IVonkContext context)
         {
-            Task createDocument = Document(context);
-            createDocument.Wait();
+            await Document(context);
         }
 
         [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "POST", AcceptedTypes = new string[] { "Composition" })]
-        public void DocumentInstancePOST(IVonkContext context)
+        public async Task DocumentInstancePOST(IVonkContext context)
         {
-            Task createDocument = Document(context);
-            createDocument.Wait();
+            await Document(context);
         }
 
         /* 
