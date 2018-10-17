@@ -16,13 +16,13 @@ using Task = System.Threading.Tasks.Task;
 
 namespace VonkDocumentOperation
 {
-    public class DocumentRepository
+    public class DocumentService
     {
 
         private ISearchRepository searchRepository;
         private IResourceChangeRepository changeRepository;
 
-        public DocumentRepository(ISearchRepository searchRepsoitory, IResourceChangeRepository changeRepository)
+        public DocumentService(ISearchRepository searchRepsoitory, IResourceChangeRepository changeRepository)
         {
             this.searchRepository = searchRepsoitory;
             this.changeRepository = changeRepository;
