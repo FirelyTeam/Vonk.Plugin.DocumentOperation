@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Vonk.Core.Pluggability;
+using Vonk.Core.Context;
 
-namespace VonkDocumentOperation
+namespace Vonk.Plugin.DocumentOperation
 {
     [VonkConfiguration(order: 4900)]
     public static class DocumentOperationConfiguration
@@ -20,10 +21,8 @@ namespace VonkDocumentOperation
         public static IApplicationBuilder Configure(IApplicationBuilder builder)
         {
             // Register interactions
-            builder.UseVonkInteraction<DocumentService>((doc, context) => doc.DocumentTypeGET(context), OperationType.Handler);
-            builder.UseVonkInteraction<DocumentService>((doc, context) => doc.DocumentTypePOST(context), OperationType.Handler);
-            builder.UseVonkInteractionAsync<DocumentService>((doc, context) => doc.DocumentInstanceGET(context), OperationType.Handler);
-            builder.UseVonkInteractionAsync<DocumentService>((doc, context) => doc.DocumentInstancePOST(context), OperationType.Handler);
+            builder.UseVonkInteractionAsync<DocumentService>((svc, context) => svc.DocumentInstanceGET(context), OperationType.Handler);
+
             return builder;
         }
     }
