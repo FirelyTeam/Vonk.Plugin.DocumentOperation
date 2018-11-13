@@ -100,13 +100,6 @@ namespace Vonk.Plugin.DocumentOperation
                 composedBundle.Total = 0;
             }
 
-            // Check if we need to persist the bundle
-            var userRequestedPersistOption = vonkContext.Arguments.GetArgument("persist")?.ArgumentValue;
-            if (userRequestedPersistOption.Equals("true"))
-            {
-                await _changeRepository.Create(composedBundle.ToIResource());
-            }
-
             // Handle responses
             IVonkResponse response = vonkContext.Response;
             vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
@@ -114,6 +107,14 @@ namespace Vonk.Plugin.DocumentOperation
             {
                 CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference));
                 return;
+            }
+
+            // Check if we need to persist the bundle
+            var persistArgument = vonkContext.Arguments.GetArgument("persist");
+            var userRequestedPersistOption = persistArgument == null ? "" : persistArgument.ArgumentValue;
+            if (userRequestedPersistOption.Equals("true"))
+            {
+                await _changeRepository.Create(composedBundle.ToIResource());
             }
 
             SendCreatedDocument(response, composedBundle); // Return newly created document
