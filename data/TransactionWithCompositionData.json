@@ -1,0 +1,375 @@
+{
+  "resourceType": "Bundle",
+  "meta": {
+    "lastUpdated": "2018-11-13T14:11:00.621+01:00"
+  },
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:61ebe359-bfdc-4613-8bf2-c5e300945f0a",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "565fba34-eeef-433f-aa08-80fff0518221",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\">Some narrative<\/div>"
+        },
+        "active": true,
+        "name": [
+          {
+            "use": "official",
+            "family": "Chalmers",
+            "given": [
+              "Peter",
+              "James"
+            ]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "1974-12-25"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient\/565fba34-eeef-433f-aa08-80fff0518221"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:61ebe359-bfdc-4613-8bf2-c5e300945f0b",
+      "resource": {
+        "resourceType": "Medication",
+        "id": "e570e0f8-c5fc-496f-b622-23fa23e3115a",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\"><p><b>Generated Narrative with Details<\/b><\/p><p><b>id<\/b>: med0310<\/p><p><b>contained<\/b>: <\/p><p><b>code<\/b>: Oral Form Oxycodone (product) <span>(Details : {SNOMED CT code '430127000' = 'Oral form oxycodone', given as 'Oral Form Oxycodone (product)'})<\/span><\/p><p><b>isBrand<\/b>: false<\/p><p><b>form<\/b>: Tablet dose form (qualifier value) <span>(Details : {SNOMED CT code '385055001' = 'Tablet', given as 'Tablet dose form (qualifier value)'})<\/span><\/p><h3>Ingredients<\/h3><table><tr><td>-<\/td><td><b>Item[x]<\/b><\/td><td><b>Amount<\/b><\/td><\/tr><tr><td>*<\/td><td>id: sub03; Oxycodone (substance) <span>(Details : {SNOMED CT code '55452001' = 'Oxycodone', given as 'Oxycodone (substance)'})<\/span><\/td><td>5 mg<span> (Details: UCUM code mg = 'mg')<\/span>\/1 TAB<span> (Details: http:\/\/hl7.org\/fhir\/v3\/orderableDrugForm code TAB = 'Tablet')<\/span><\/td><\/tr><\/table><\/div>"
+        },
+        "contained": [
+          {
+            "resourceType": "Substance",
+            "id": "sub03",
+            "code": {
+              "coding": [
+                {
+                  "system": "http:\/\/snomed.info\/sct",
+                  "code": "55452001",
+                  "display": "Oxycodone (substance)"
+                }
+              ]
+            }
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http:\/\/snomed.info\/sct",
+              "code": "430127000",
+              "display": "Oral Form Oxycodone (product)"
+            }
+          ]
+        },
+        "isBrand": false,
+        "form": {
+          "coding": [
+            {
+              "system": "http:\/\/snomed.info\/sct",
+              "code": "385055001",
+              "display": "Tablet dose form (qualifier value)"
+            }
+          ]
+        },
+        "ingredient": [
+          {
+            "itemReference": {
+              "reference": "#sub03"
+            },
+            "amount": {
+              "numerator": {
+                "value": 5,
+                "system": "http:\/\/unitsofmeasure.org",
+                "code": "mg"
+              },
+              "denominator": {
+                "value": 1,
+                "system": "http:\/\/hl7.org\/fhir\/v3\/orderableDrugForm",
+                "code": "TAB"
+              }
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Medication\/e570e0f8-c5fc-496f-b622-23fa23e3115a"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "MedicationStatement",
+        "id": "9542d531-76ae-42eb-aae9-1169b8b870b1",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\"><p><b>Generated Narrative with Details<\/b><\/p><p><b>id<\/b>: example006<\/p><p><b>status<\/b>: active<\/p><p><b>medication<\/b>: Amoxicillin (product) <span>(Details : {SNOMED CT code '27658006' = 'p-Hydroxyampicillin', given as 'Amoxicillin (product)'})<\/span><\/p><p><b>effective<\/b>: 01\/02\/2014<\/p><p><b>dateAsserted<\/b>: 22\/02\/2014<\/p><p><b>informationSource<\/b>: <a>Peter Chalmers<\/a><\/p><p><b>subject<\/b>: <a>Donald Duck<\/a><\/p><p><b>taken<\/b>: n<\/p><p><b>note<\/b>: Father indicates they miss the occasional dose<\/p><p><b>dosage<\/b>: <\/p><\/div>"
+        },
+        "status": "active",
+        "medicationReference": {
+          "reference": "Medication\/e570e0f8-c5fc-496f-b622-23fa23e3115a"
+        },
+        "effectiveDateTime": "2014-02-01",
+        "dateAsserted": "2014-02-22",
+        "subject": {
+          "reference": "Patient\/565fba34-eeef-433f-aa08-80fff0518221",
+          "display": "Peter Chalmers"
+        },
+        "taken": "n",
+        "note": [
+          {
+            "text": "Father indicates they miss the occasional dose"
+          }
+        ],
+        "dosage": [
+          {
+            "sequence": 1,
+            "text": "5ml three times daily",
+            "asNeededBoolean": false,
+            "route": {
+              "coding": [
+                {
+                  "system": "http:\/\/snomed.info\/sct",
+                  "code": "260548002",
+                  "display": "Oral"
+                }
+              ]
+            },
+            "doseQuantity": {
+              "value": 5,
+              "unit": "mL",
+              "system": "http:\/\/unitsofmeasure.org",
+              "code": "mL"
+            },
+            "maxDosePerPeriod": {
+              "numerator": {
+                "value": 3
+              },
+              "denominator": {
+                "value": 1,
+                "system": "http:\/\/unitsofmeasure.org",
+                "code": "d"
+              }
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "MedicationStatement\/9542d531-76ae-42eb-aae9-1169b8b870b1"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "e706ba2c-9082-4451-a5ea-f8e1f161c807",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\"><p><b>Generated Narrative with Details<\/b><\/p><p><b>id<\/b>: example<\/p><p><b>status<\/b>: final<\/p><p><b>category<\/b>: Vital Signs <span>(Details : {http:\/\/hl7.org\/fhir\/observation-category code 'vital-signs' = 'Vital Signs', given as 'Vital Signs'})<\/span><\/p><p><b>code<\/b>: Body Weight <span>(Details : {LOINC code '29463-7' = 'Body weight', given as 'Body Weight'}; {LOINC code '3141-9' = 'Body weight Measured', given as 'Body weight Measured'}; {SNOMED CT code '27113001' = 'Body weight', given as 'Body weight'}; {http:\/\/acme.org\/devices\/clinical-codes code 'body-weight' = 'body-weight', given as 'Body Weight'})<\/span><\/p><p><b>subject<\/b>: <a>Patient\/example<\/a><\/p><p><b>context<\/b>: <a>Encounter\/example<\/a><\/p><p><b>effective<\/b>: 28\/03\/2016<\/p><p><b>value<\/b>: 185 lbs<span> (Details: UCUM code [lb_av] = 'lb_av')<\/span><\/p><\/div>"
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http:\/\/hl7.org\/fhir\/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http:\/\/loinc.org",
+              "code": "29463-7",
+              "display": "Body Weight"
+            },
+            {
+              "system": "http:\/\/loinc.org",
+              "code": "3141-9",
+              "display": "Body weight Measured"
+            },
+            {
+              "system": "http:\/\/snomed.info\/sct",
+              "code": "27113001",
+              "display": "Body weight"
+            },
+            {
+              "system": "http:\/\/acme.org\/devices\/clinical-codes",
+              "code": "body-weight",
+              "display": "Body Weight"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient\/565fba34-eeef-433f-aa08-80fff0518221"
+        },
+        "context": {
+          "reference": "Encounter\/e6afc318-b47a-4dbb-b4a3-1fb72b81872c"
+        },
+        "effectiveDateTime": "2016-03-28",
+        "valueQuantity": {
+          "value": 185,
+          "unit": "lbs",
+          "system": "http:\/\/unitsofmeasure.org",
+          "code": "[lb_av]"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation\/e706ba2c-9082-4451-a5ea-f8e1f161c807"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "e6afc318-b47a-4dbb-b4a3-1fb72b81872c",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\">Encounter with patient @example<\/div>"
+        },
+        "status": "in-progress",
+        "class": {
+          "system": "http:\/\/hl7.org\/fhir\/v3\/ActCode",
+          "code": "IMP",
+          "display": "inpatient encounter"
+        },
+        "subject": {
+          "reference": "Patient\/565fba34-eeef-433f-aa08-80fff0518221"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Encounter\/e6afc318-b47a-4dbb-b4a3-1fb72b81872c"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "c239608b-07a0-40e0-aef5-c529797408ab",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http:\/\/www.w3.org\/1999\/xhtml\">\n      <p>Dr Adam Careful is a Referring Practitioner for Acme Hospital from 1-Jan 2012 to 31-Mar\n        2012<\/p>\n    <\/div>"
+        },
+        "identifier": [
+          {
+            "system": "http:\/\/www.acme.org\/practitioners",
+            "value": "23"
+          }
+        ],
+        "active": true,
+        "name": [
+          {
+            "family": "Careful",
+            "given": [
+              "Adam"
+            ],
+            "prefix": [
+              "Dr"
+            ]
+          }
+        ],
+        "address": [
+          {
+            "use": "home",
+            "line": [
+              "534 Erewhon St"
+            ],
+            "city": "PleasantVille",
+            "state": "Vic",
+            "postalCode": "3999"
+          }
+        ],
+        "qualification": [
+          {
+            "identifier": [
+              {
+                "system": "http:\/\/example.org\/UniversityIdentifier",
+                "value": "12345"
+              }
+            ],
+            "code": {
+              "coding": [
+                {
+                  "system": "http:\/\/hl7.org\/fhir\/v2\/0360\/2.7",
+                  "code": "BS",
+                  "display": "Bachelor of Science"
+                }
+              ],
+              "text": "Bachelor of Science"
+            },
+            "period": {
+              "start": "1995"
+            },
+            "issuer": {
+              "display": "Example University"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Practitioner\/c239608b-07a0-40e0-aef5-c529797408ab"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Composition",
+        "id": "f6ac0e67-6db6-4e16-a120-5660396b7c81",
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http:\/\/loinc.org",
+              "code": "77603-9",
+              "display": "Medication treatment plan.extended Document"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient\/565fba34-eeef-433f-aa08-80fff0518221"
+        },
+        "date": "2017-05-02T12:00:00Z",
+        "author": [
+          {
+            "reference": "Practitioner\/c239608b-07a0-40e0-aef5-c529797408ab"
+          }
+        ],
+        "title": "Patientenbezogener Medikationsplan",
+        "section": [
+          {
+            "entry": [
+              {
+                "reference": "Encounter\/e6afc318-b47a-4dbb-b4a3-1fb72b81872c"
+              }
+            ]
+          },
+          {
+            "entry": [
+              {
+                "reference": "Observation\/e706ba2c-9082-4451-a5ea-f8e1f161c807"
+              }
+            ]
+          },
+          {
+            "entry": [
+              {
+                "reference": "MedicationStatement\/9542d531-76ae-42eb-aae9-1169b8b870b1"
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Composition\/f6ac0e67-6db6-4e16-a120-5660396b7c81"
+      }
+    }
+  ]
+}
