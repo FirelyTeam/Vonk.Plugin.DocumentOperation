@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Vonk.Core" Version="1.0.0" />
+    <PackageReference Include="Hl7.Fhir.STU3" Version="0.96.0" />
+    <PackageReference Include="Vonk.Fhir.R3" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Properties\launchSettings.json" />
+  </ItemGroup>
+</Project>
