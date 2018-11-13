@@ -52,7 +52,8 @@ namespace Vonk.Plugin.DocumentOperation
             var (request, args, response) = context.Parts();
             if (request.GetRequiredPayload(response, out var parameters))
             {
-                var compositionID = (parameters as Parameters)?.Parameter.Where(p => p.Name == "id").FirstOrDefault()?.Value?.ToString();
+                var parametersResource = parameters.ToPoco<Parameters>();
+                var compositionID = parametersResource?.Parameter.Where(p => p.Name == "id").FirstOrDefault()?.Value?.ToString();
                 if (string.IsNullOrEmpty(compositionID))
                 {
                     response.HttpResult = StatusCodes.Status400BadRequest;
