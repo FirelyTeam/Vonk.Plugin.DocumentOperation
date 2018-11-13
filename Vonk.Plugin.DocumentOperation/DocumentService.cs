@@ -1,5 +1,6 @@
 ﻿using Hl7.Fhir.Model;
 using Hl7.Fhir.Support;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -41,7 +42,31 @@ namespace Vonk.Plugin.DocumentOperation
         [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "GET", AcceptedTypes = new string[] { "Composition" })]
         public async Task DocumentInstanceGET(IVonkContext vonkContext)
         {
-            await Document(vonkContext);
+            var compositionID = vonkContext.Arguments.ResourceIdArgument().ArgumentValue;
+            await Document(vonkContext, compositionID);
+        }
+
+        [InteractionHandler(VonkInteraction.type_custom, CustomOperation = "document", Method = "POST", AcceptedTypes = new string[] { "Composition" })]
+        public async Task DocumentTypePOST(IVonkContext context)
+        {
+            var (request, args, response) = context.Parts();
+            if (request.GetRequiredPayload(response, out var parameters))
+            {
+                var compositionID = (parameters as Parameters)?.Parameter.Where(p => p.Name == "id").FirstOrDefault()?.Value?.ToString();
+                if (string.IsNullOrEmpty(compositionID))
+                {
+                    response.HttpResult = StatusCodes.Status400BadRequest;
+                    response.AddIssue("Parameter 'id' is missing.", VonkIssues.INVALID_REQUEST);
+                    return;
+                }
+                if (!Uri.TryCreate(compositionID, UriKind.Relative, out var uri))
+                {
+                    response.HttpResult = StatusCodes.Status501NotImplemented;
+                    response.AddIssue("Parameter 'id' is an absolute url, which is not supported.", VonkIssues.NOT_IMPLEMENTED);
+                    return;
+                }
+                await Document(context, compositionID);
+            }
         }
 
         /// <summary>
@@ -51,14 +76,13 @@ namespace Vonk.Plugin.DocumentOperation
         /// </summary>
         /// <param name="vonkContext"></param>
         /// <returns></returns>
-        public async Task Document(IVonkContext vonkContext)
+        public async Task Document(IVonkContext vonkContext, string compositionID)
         {
             // Build (basic) search bundle
             var operationRequestPath = vonkContext.Request.Path;
             var composedBundle = CreateEmptyBundle(operationRequestPath);
 
             // Get Composition resource
-            var compositionID = vonkContext.Arguments.ResourceIdArgument().ArgumentValue;
             (bool allResourceResolved, Resource resolvedResource, string failedReference) = await ResolveResource(compositionID, "Composition");
 
             if (allResourceResolved)

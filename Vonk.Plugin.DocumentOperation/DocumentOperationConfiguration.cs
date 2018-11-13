@@ -22,6 +22,7 @@ namespace Vonk.Plugin.DocumentOperation
         {
             // Register interactions
             builder.UseVonkInteractionAsync<DocumentService>((svc, context) => svc.DocumentInstanceGET(context), OperationType.Handler);
+            builder.UseVonkInteractionAsync<DocumentService>((svc, context) => svc.DocumentTypePOST(context), OperationType.Handler);
 
             return builder;
         }
