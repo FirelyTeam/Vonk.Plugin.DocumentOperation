@@ -16,17 +16,16 @@ For instructon on how to run the plug-in and the Vonk server, please see the off
 
 ### Build dependencies
 The following configuration has been succesfully tested for building and running the project:
-* Vonk FHIR server - Version 0.7.2.0
+* Vonk FHIR server - Version 0.1.0.0
 * Visual Studio for Mac - Version 7.6.3
+* Visual Studio for Windows - Version 15.8.*
 * .Net Core - Version 2.0
 
 ## Limitations
 
 Currently the following limitations exist in the implemenation:
-* The $document operation is not working correctly on a type level
 * No digital signature is added on the created document
 * Absolute (remote) references are not included in a document
-* Misleading OperationOutcome is returned for absolute (remote) references
 
 ## Tests
 
