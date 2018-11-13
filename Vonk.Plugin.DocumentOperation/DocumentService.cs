@@ -52,7 +52,8 @@ namespace Vonk.Plugin.DocumentOperation
             var (request, args, response) = context.Parts();
             if (request.GetRequiredPayload(response, out var parameters))
             {
-                var compositionID = (parameters as Parameters)?.Parameter.Where(p => p.Name == "id").FirstOrDefault()?.Value?.ToString();
+                var parametersResource = parameters.ToPoco<Parameters>();
+                var compositionID = parametersResource?.Parameter.Where(p => p.Name == "id").FirstOrDefault()?.Value?.ToString();
                 if (string.IsNullOrEmpty(compositionID))
                 {
                     response.HttpResult = StatusCodes.Status400BadRequest;
@@ -100,13 +101,6 @@ namespace Vonk.Plugin.DocumentOperation
                 composedBundle.Total = 0;
             }
 
-            // Check if we need to persist the bundle
-            var userRequestedPersistOption = vonkContext.Arguments.GetArgument("persist")?.ArgumentValue;
-            if (userRequestedPersistOption.Equals("true"))
-            {
-                await _changeRepository.Create(composedBundle.ToIResource());
-            }
-
             // Handle responses
             IVonkResponse response = vonkContext.Response;
             vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
@@ -114,6 +108,14 @@ namespace Vonk.Plugin.DocumentOperation
             {
                 CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference));
                 return;
+            }
+
+            // Check if we need to persist the bundle
+            var persistArgument = vonkContext.Arguments.GetArgument("persist");
+            var userRequestedPersistOption = persistArgument == null ? "" : persistArgument.ArgumentValue;
+            if (userRequestedPersistOption.Equals("true"))
+            {
+                await _changeRepository.Create(composedBundle.ToIResource());
             }
 
             SendCreatedDocument(response, composedBundle); // Return newly created document
@@ -222,14 +224,15 @@ namespace Vonk.Plugin.DocumentOperation
 
         private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveLocalResource(string reference)
         {
-            var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
-
-            var resource = result.ToPoco<Resource>();
-            if (resource != null)
+            try
             {
+                var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
+                var resource = result.ToPoco<Resource>();
                 return (true, resource, "");
             }
-            return (false, null, reference);
+            catch{
+                return (false, null, reference);
+            }
         }
 
         #endregion Helper - Resolve resources
