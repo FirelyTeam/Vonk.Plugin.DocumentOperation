@@ -33,10 +33,16 @@ Currently the following limitations exist in the implemenation:
 The $document operation is defined in FHIR for multiple interactions:
 
 * Type level interaction:<br>
-    > [base]/Composition/$document
+    > POST [base]/Composition/$document
+    with a Parameters resource in the body
 
 * Instance level interaction:<br>
-    > [base]/Composition/[id]/$document
+    > GET [base]/Composition/[id]/$document
+
+To test the operation:
+- POST the TransactionWithExampleComposition.json to your endpoint.
+- Inspect the result for the id that the Composition resource got.
+- Generate a document with ``GET [base]/Composition/[id]/$document``
 
 ## License
 
