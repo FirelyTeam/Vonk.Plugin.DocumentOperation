@@ -116,7 +116,7 @@ namespace Vonk.Plugin.DocumentOperation
 
             // Check if we need to persist the bundle
             var persistArgument = vonkContext.Arguments.GetArgument("persist");
-            var userRequestedPersistOption = persistArgument == null ? "" : persistArgument.ArgumentValue;
+            var userRequestedPersistOption = persistArgument == null ? String.Empty : persistArgument.ArgumentValue;
             if (userRequestedPersistOption.Equals("true"))
             {
                 await _changeRepository.Create(composedBundle.ToIResource());
@@ -161,7 +161,7 @@ namespace Vonk.Plugin.DocumentOperation
             // Skip the following resources: 
             //    - Contained resources as they are already included through their parents
             //    - Resources that are already included in the search bundle
-            (bool successfulResolve, Resource resolvedResource, string failedReference) = (true, null, "");
+            (bool successfulResolve, Resource resolvedResource, string failedReference) = (true, null, String.Empty);
             foreach (var reference in references)
             {
                 var referenceValue = reference.Value.ToString();
@@ -232,7 +232,7 @@ namespace Vonk.Plugin.DocumentOperation
             {
                 var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
                 var resource = result.ToPoco<Resource>();
-                return (true, resource, "");
+                return (true, resource, String.Empty);
             }
             catch{
                 return (false, null, reference);
