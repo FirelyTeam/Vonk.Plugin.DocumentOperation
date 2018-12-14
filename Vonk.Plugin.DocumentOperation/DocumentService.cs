@@ -84,29 +84,33 @@ namespace Vonk.Plugin.DocumentOperation
             var composedBundle = CreateEmptyBundle(operationRequestPath);
 
             // Get Composition resource
-            (bool allResourceResolved, Resource resolvedResource, string failedReference) = await ResolveResource(compositionID, "Composition");
-
-            if (allResourceResolved)
+            (bool compositionResolved, Resource resolvedResource, string failedReference) = await ResolveResource(compositionID, "Composition");
+            if (compositionResolved)
             {
                 // Include Composition resource in search results
                 composedBundle.Total = 1;
                 composedBundle.AddSearchEntry(resolvedResource, "Composition/" + compositionID, Bundle.SearchEntryMode.Match);
 
                 // Recursively resolve and include all references in the search bundle
-                (allResourceResolved, failedReference) = await IncludeReferencesInBundle(resolvedResource, composedBundle);
-            }
-            else  // Composition resource, on which the operation is called, does not exist
-            {
-                _logger.LogTrace("$document called on non-existing Composition/{id}", compositionID);
-                composedBundle.Total = 0;
+                bool includedResourcesResolved;
+                (includedResourcesResolved, failedReference) = await IncludeReferencesInBundle(resolvedResource, composedBundle);
             }
 
             // Handle responses
             IVonkResponse response = vonkContext.Response;
             vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
-            if (!allResourceResolved)
+            if (!failedReference.Equals(string.Empty))
             {
-                CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference));
+                if (!compositionResolved) // Composition resource, on which the operation is called, does not exist
+                {
+                    _logger.LogTrace("$document called on non-existing Composition/{id}", compositionID);
+                    composedBundle.Total = 0;
+                    CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference, IssueSeverity.Warning), StatusCodes.Status200OK, composedBundle);
+                }
+                else
+                {
+                    CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference));
+                }
                 return;
             }
 
@@ -247,20 +251,20 @@ namespace Vonk.Plugin.DocumentOperation
             response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
         }
 
-        private void CancelDocumentOperation(IVonkResponse response, IssueComponent issue)
+        private void CancelDocumentOperation(IVonkResponse response, IssueComponent issue, int statusCode = StatusCodes.Status500InternalServerError, Bundle searchBundle = null)
         {
-            response.Payload = null;
-            response.HttpResult = 500;
+            response.Payload = searchBundle?.ToIResource();
+            response.HttpResult = statusCode;
             response.Outcome.AddIssue(issue);
         }
 
         #endregion Helper - Return response
 
-        private IssueComponent LocalReferenceNotResolvedIssue(string failedReference)
+        private IssueComponent LocalReferenceNotResolvedIssue(string failedReference, OperationOutcome.IssueSeverity severity = IssueSeverity.Error)
         {
             var issue = new OperationOutcome.IssueComponent()
             {
-                Severity = OperationOutcome.IssueSeverity.Error
+                Severity = severity
             };
             issue.Code = IssueType.NotFound;
             issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference);
