@@ -267,11 +267,5 @@ namespace Vonk.Plugin.DocumentOperation
             return issue;
         }
 
-        private void OperationNotImplemented(IVonkResponse response)
-        {
-            response.Payload = null;
-            response.HttpResult = 501;
-        }
-
     }
 }
