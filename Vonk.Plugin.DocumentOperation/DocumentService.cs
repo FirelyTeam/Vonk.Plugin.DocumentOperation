@@ -105,11 +105,11 @@ namespace Vonk.Plugin.DocumentOperation
                 {
                     _logger.LogTrace("$document called on non-existing Composition/{id}", compositionID);
                     composedBundle.Total = 0;
-                    CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference, IssueSeverity.Warning), StatusCodes.Status200OK, composedBundle);
+                    CancelDocumentOperation(response, StatusCodes.Status404NotFound);
                 }
                 else
                 {
-                    CancelDocumentOperation(response, LocalReferenceNotResolvedIssue(failedReference));
+                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError, LocalReferenceNotResolvedIssue(failedReference));
                 }
                 return;
             }
@@ -251,11 +251,11 @@ namespace Vonk.Plugin.DocumentOperation
             response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
         }
 
-        private void CancelDocumentOperation(IVonkResponse response, IssueComponent issue, int statusCode = StatusCodes.Status500InternalServerError, Bundle searchBundle = null)
+        private void CancelDocumentOperation(IVonkResponse response, int statusCode, IssueComponent issue = null)
         {
-            response.Payload = searchBundle?.ToIResource();
             response.HttpResult = statusCode;
-            response.Outcome.AddIssue(issue);
+            if(issue != null)
+                response.Outcome.AddIssue(issue);
         }
 
         #endregion Helper - Return response
@@ -264,10 +264,10 @@ namespace Vonk.Plugin.DocumentOperation
         {
             var issue = new OperationOutcome.IssueComponent()
             {
+                Code = IssueType.NotFound,
+                Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference),
                 Severity = severity
             };
-            issue.Code = IssueType.NotFound;
-            issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference);
             return issue;
         }
 
