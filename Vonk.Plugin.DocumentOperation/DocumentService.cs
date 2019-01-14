@@ -79,21 +79,19 @@ namespace Vonk.Plugin.DocumentOperation
         /// <returns></returns>
         public async Task Document(IVonkContext vonkContext, string compositionID)
         {
-            // Build (basic) search bundle
-            var operationRequestPath = vonkContext.Request.Path;
-            var composedBundle = CreateEmptyBundle(operationRequestPath);
+            // Build empty document bundle
+            var documentBundle = CreateEmptyBundle();
 
             // Get Composition resource
             (bool compositionResolved, Resource resolvedResource, string failedReference) = await ResolveResource(compositionID, "Composition");
             if (compositionResolved)
             {
                 // Include Composition resource in search results
-                composedBundle.Total = 1;
-                composedBundle.AddSearchEntry(resolvedResource, "Composition/" + compositionID, Bundle.SearchEntryMode.Match);
+                documentBundle.AddResourceEntry(resolvedResource, "Composition/" + compositionID);
 
                 // Recursively resolve and include all references in the search bundle
                 bool includedResourcesResolved;
-                (includedResourcesResolved, failedReference) = await IncludeReferencesInBundle(resolvedResource, composedBundle);
+                (includedResourcesResolved, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
             }
 
             // Handle responses
@@ -104,10 +102,9 @@ namespace Vonk.Plugin.DocumentOperation
                 if (!compositionResolved) // Composition resource, on which the operation is called, does not exist
                 {
                     _logger.LogTrace("$document called on non-existing Composition/{id}", compositionID);
-                    composedBundle.Total = 0;
                     CancelDocumentOperation(response, StatusCodes.Status404NotFound);
                 }
-                else
+                else // Local or external reference reference could not be found
                 {
                     CancelDocumentOperation(response, StatusCodes.Status500InternalServerError, LocalReferenceNotResolvedIssue(failedReference));
                 }
@@ -119,10 +116,10 @@ namespace Vonk.Plugin.DocumentOperation
             var userRequestedPersistOption = persistArgument == null ? String.Empty : persistArgument.ArgumentValue;
             if (userRequestedPersistOption.Equals("true"))
             {
-                await _changeRepository.Create(composedBundle.ToIResource());
+                await _changeRepository.Create(documentBundle.ToIResource());
             }
 
-            SendCreatedDocument(response, composedBundle); // Return newly created document
+            SendCreatedDocument(response, documentBundle); // Return newly created document
         }
 
         /// <summary>
@@ -146,10 +143,10 @@ namespace Vonk.Plugin.DocumentOperation
         /// Overloaded method for recursive use.
         /// </summary>
         /// <param name="resource"></param>
-        /// <param name="searchBundle"></param>
+        /// <param name="documentBundle"></param>
         /// <param name="includedReferences">Remember which resources were already added to the search bundle</param>
         /// <returns></returns>
-        private async Task<(bool success, string failedReference)> IncludeReferencesInBundle(Resource resource, Bundle searchBundle, HashSet<string> includedReferences)
+        private async Task<(bool success, string failedReference)> IncludeReferencesInBundle(Resource resource, Bundle documentBundle, HashSet<string> includedReferences)
         {
             // Get references of given resource
             var vonkResource = resource.ToIResource();
@@ -169,7 +166,7 @@ namespace Vonk.Plugin.DocumentOperation
                 {
                     (successfulResolve, resolvedResource, failedReference) = await ResolveResource(referenceValue);
                     if(successfulResolve){
-                        searchBundle.AddSearchEntry(resolvedResource, referenceValue, Bundle.SearchEntryMode.Include);
+                        documentBundle.AddResourceEntry(resolvedResource, referenceValue);
                         includedReferences.Add(referenceValue);
                     }
                     else{
@@ -177,7 +174,7 @@ namespace Vonk.Plugin.DocumentOperation
                     }
 
                     // Recursively resolve all references in the included resource
-                    (successfulResolve, failedReference) = await IncludeReferencesInBundle(resolvedResource, searchBundle, includedReferences);
+                    (successfulResolve, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle, includedReferences);
                     if(!successfulResolve){
                         break;
                     }
@@ -188,18 +185,16 @@ namespace Vonk.Plugin.DocumentOperation
 
         #region Helper - Bundle-related
 
-        private Bundle CreateEmptyBundle(string operationRequestPath)
+        private Bundle CreateEmptyBundle()
         {
             return new Bundle
             {
                 Id = Guid.NewGuid().ToString(),
-                Type = Bundle.BundleType.Searchset,
+                Type = Bundle.BundleType.Document,
                 Meta = new Meta()
                 {
                     LastUpdatedElement = Instant.Now()
-                },
-                SelfLink = new Uri(operationRequestPath, UriKind.Relative)
-                // A relative link is sufficient, Vonk will translate it to an absolute url based on the base path that was used in the request.
+                }
             };
         }
 
