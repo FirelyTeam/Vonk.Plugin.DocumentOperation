@@ -219,11 +219,9 @@ namespace Vonk.Plugin.DocumentOperation
                 (bool successfulResolve, Resource resource, string failedReference) = await ResolveLocalResource(reference);
                 return (successfulResolve, resource, failedReference);
             }
-            else
-            {
-                // Server chooses not to handle absolute (remote) references
-                return (false, null, reference);
-            }
+
+             // Server chooses not to handle absolute (remote) references
+            return (false, null, reference);
         }
 
         private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveLocalResource(string reference)
