@@ -260,13 +260,13 @@ namespace Vonk.Plugin.DocumentOperation
 
         #endregion Helper - Return response
 
-        private IssueComponent LocalReferenceNotResolvedIssue(string failedReference, OperationOutcome.IssueSeverity severity = IssueSeverity.Error)
+        private IssueComponent LocalReferenceNotResolvedIssue(string failedReference)
         {
             var issue = new OperationOutcome.IssueComponent()
             {
                 Code = IssueType.NotFound,
-                Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference),
-                Severity = severity
+                Severity = IssueSeverity.Error,
+                Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference)
             };
             return issue;
         }
