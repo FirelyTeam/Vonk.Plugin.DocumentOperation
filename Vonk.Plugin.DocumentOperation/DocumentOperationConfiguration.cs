@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Vonk.Core.Pluggability;
-using Vonk.Core.Context;
 using Vonk.Core.Support;
 
 namespace Vonk.Plugin.DocumentOperation
