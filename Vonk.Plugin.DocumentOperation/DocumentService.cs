@@ -106,7 +106,7 @@ namespace Vonk.Plugin.DocumentOperation
                 }
                 else // Local or external reference reference could not be found
                 {
-                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError, LocalReferenceNotResolvedIssue(failedReference));
+                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError, ReferenceNotResolvedIssue(failedReference));
                 }
                 return;
             }
@@ -209,7 +209,7 @@ namespace Vonk.Plugin.DocumentOperation
 
         private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveResource(string reference)
         {
-            if (Uri.IsWellFormedUriString(reference, UriKind.Relative))
+            if (IsRelativeUrl(reference))
             {
                 (bool successfulResolve, Resource resource, string failedReference) = await ResolveLocalResource(reference);
                 return (successfulResolve, resource, failedReference);
@@ -230,6 +230,11 @@ namespace Vonk.Plugin.DocumentOperation
             catch{
                 return (false, null, reference);
             }
+        }
+
+        private bool IsRelativeUrl(string reference)
+        {
+            return Uri.IsWellFormedUriString(reference, UriKind.Relative);
         }
 
         #endregion Helper - Resolve resources
@@ -253,14 +258,24 @@ namespace Vonk.Plugin.DocumentOperation
 
         #endregion Helper - Return response
 
-        private IssueComponent LocalReferenceNotResolvedIssue(string failedReference)
+        private IssueComponent ReferenceNotResolvedIssue(string failedReference)
         {
             var issue = new OperationOutcome.IssueComponent()
             {
-                Code = IssueType.NotFound,
                 Severity = IssueSeverity.Error,
-                Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference)
             };
+
+            if (IsRelativeUrl(failedReference))
+            {
+                issue.Code = IssueType.NotFound;
+                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference);
+            }
+            else
+            {
+                issue.Code = IssueType.NotSupported;
+                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_EXTERNAL_FAIL", "Resolving of external resource references (" + failedReference + ") is not supported");
+            }
+
             return issue;
         }
 
