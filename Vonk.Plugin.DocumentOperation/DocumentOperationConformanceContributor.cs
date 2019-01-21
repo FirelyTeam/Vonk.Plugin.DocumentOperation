@@ -13,6 +13,7 @@ namespace Vonk.Plugin.DocumentOperation
 
         public DocumentOperationConformanceContributor(IOptions<SupportedInteractionOptions> optionAccessor)
         {
+            Check.NotNull(optionAccessor, nameof(optionAccessor));
             _supportedInteractionOptions = optionAccessor.Value;
         }
 
