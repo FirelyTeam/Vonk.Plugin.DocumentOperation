@@ -273,7 +273,7 @@ namespace Vonk.Plugin.DocumentOperation
             else
             {
                 issue.Code = IssueType.NotSupported;
-                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_EXTERNAL_FAIL", "Resolving of external resource references (" + failedReference + ") is not supported");
+                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_EXTERNAL_FAIL", "Resolving external resource references (" + failedReference + ") is not supported");
             }
 
             return issue;
