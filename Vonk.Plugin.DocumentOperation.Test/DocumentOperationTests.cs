@@ -24,7 +24,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
             - (X) $document should return HTTP 404 when being called on a missing composition         
             - (X) $document should persist the generated document on request
             - (X) $document should return an INVALID_REQUEST when being called with POST and an missing id
-            - (X) $document should thrown an internal server error if a local reference to a resource, which should be included in the document, can't be found.          
+            - (X) $document should throw an internal server error if a local reference to a resource, which should be included in the document, can't be found.
+            - (X) $document should thorw an internal server error if an external reference is requested to be included in the document
     */
 
     public class DocumentOperationTests
@@ -202,7 +203,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             await _documentService.DocumentInstanceGET(testContext);
 
             // Check response status
-            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition");
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
         }
 
         [Fact]
@@ -232,7 +233,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             await _documentService.DocumentInstanceGET(testContext);
 
             // Check response status
-            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition");
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
         }
 
         [Fact]
@@ -266,7 +267,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             await _documentService.DocumentInstanceGET(testContext);
 
             // Check response status
-            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition");
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
         }
 
         [Fact]
@@ -307,12 +308,42 @@ namespace Vonk.Plugin.DocumentOperation.Test
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should return HTTP 200 - OK when all references in the composition (incl. recursive references) can be resolved");
         }
 
+        [Fact]
+        public async Task DocumentOperationInternalServerErrorOnExternalReference()
+        {
+            // Setup Composition resource
+            var composition = CreateTestCompositionAbsoulteReferences(); // External reference (patient resource) in the composition resource
+            var compositionSearchResult = new SearchResult(new List() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
+
+            // Create VonkContext for $document (GET / Instance level)
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceId, "test")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "GET";
+
+            // Execute $document
+            await _documentService.DocumentInstanceGET(testContext);
+
+            // Check response status
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when an external reference is referenced by the composition");
+        }
+
         // $document is expected to fail if a resource reference is missing, this should be checked on all levels of recursion.
         // Therefore, we build multiple resources, each with different unresolvable references
 
         private IResource CreateTestCompositionNoReferences()
         {
             return new Composition() { Id = "test", VersionId = "v1" }.ToIResource();
+        }
+
+        private IResource CreateTestCompositionAbsoulteReferences()
+        {
+            return new Composition() { Id = "test", VersionId = "v1", Subject = new ResourceReference("https://vonk.fire.ly/Patient/test") }.ToIResource();
         }
 
         private IResource CreateTestCompositionInclPatient()
