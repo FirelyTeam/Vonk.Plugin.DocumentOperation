@@ -24,6 +24,8 @@ namespace Vonk.Plugin.DocumentOperation
         private readonly IResourceChangeRepository _changeRepository;
         private readonly ILogger<DocumentService> _logger;
 
+        private IssueComponent _missingReferenceIssue;
+
         public DocumentService(ISearchRepository searchRepository, IResourceChangeRepository changeRepository, ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
@@ -106,7 +108,7 @@ namespace Vonk.Plugin.DocumentOperation
                 }
                 else // Local or external reference reference could not be found
                 {
-                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError, ReferenceNotResolvedIssue(failedReference));
+                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError);
                 }
                 return;
             }
@@ -215,7 +217,8 @@ namespace Vonk.Plugin.DocumentOperation
                 return (successfulResolve, resource, failedReference);
             }
 
-             // Server chooses not to handle absolute (remote) references
+            // Server chooses not to handle absolute (remote) references
+            _missingReferenceIssue = ReferenceNotResolvedIssue(reference, false);
             return (false, null, reference);
         }
 
@@ -228,6 +231,7 @@ namespace Vonk.Plugin.DocumentOperation
                 return (true, resource, String.Empty);
             }
             catch{
+                _missingReferenceIssue = ReferenceNotResolvedIssue(reference, true);
                 return (false, null, reference);
             }
         }
@@ -249,23 +253,23 @@ namespace Vonk.Plugin.DocumentOperation
             response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
         }
 
-        private void CancelDocumentOperation(IVonkResponse response, int statusCode, IssueComponent issue = null)
+        private void CancelDocumentOperation(IVonkResponse response, int statusCode)
         {
             response.HttpResult = statusCode;
-            if(issue != null)
-                response.Outcome.AddIssue(issue);
+            if(_missingReferenceIssue != null)
+                response.Outcome.AddIssue(_missingReferenceIssue);
         }
 
         #endregion Helper - Return response
 
-        private IssueComponent ReferenceNotResolvedIssue(string failedReference)
+        private IssueComponent ReferenceNotResolvedIssue(string failedReference, bool missingReferenceIsLocal)
         {
             var issue = new OperationOutcome.IssueComponent()
             {
                 Severity = IssueSeverity.Error,
             };
 
-            if (IsRelativeUrl(failedReference))
+            if (missingReferenceIsLocal)
             {
                 issue.Code = IssueType.NotFound;
                 issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference);
