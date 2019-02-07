@@ -1,7 +1,7 @@
 {
   "resourceType": "Bundle",
   "meta": {
-    "lastUpdated": "2018-11-13T14:11:00.621+01:00"
+    "lastUpdated": "2019-01-30T10:00:00.000+01:00"
   },
   "type": "transaction",
   "entry": [
@@ -368,7 +368,7 @@
       },
       "request": {
         "method": "PUT",
-        "url": "Composition\/f6ac0e67-6db6-4e16-a120-5660396b7c81"
+        "url": "Composition\/example"
       }
     }
   ]

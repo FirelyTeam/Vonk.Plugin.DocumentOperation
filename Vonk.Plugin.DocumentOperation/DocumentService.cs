@@ -26,6 +26,8 @@ namespace Vonk.Plugin.DocumentOperation
         private readonly IResourceChangeRepository _changeRepository;
         private readonly ILogger<DocumentService> _logger;
 
+        private IssueComponent _missingReferenceIssue;
+
         public DocumentService(ISearchRepository searchRepository, IResourceChangeRepository changeRepository, ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
@@ -108,7 +110,7 @@ namespace Vonk.Plugin.DocumentOperation
                 }
                 else // Local or external reference reference could not be found
                 {
-                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError, LocalReferenceNotResolvedIssue(failedReference));
+                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError);
                 }
                 return;
             }
@@ -211,13 +213,14 @@ namespace Vonk.Plugin.DocumentOperation
 
         private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveResource(string reference)
         {
-            if (Uri.IsWellFormedUriString(reference, UriKind.Relative))
+            if (IsRelativeUrl(reference))
             {
                 (bool successfulResolve, Resource resource, string failedReference) = await ResolveLocalResource(reference);
                 return (successfulResolve, resource, failedReference);
             }
 
-             // Server chooses not to handle absolute (remote) references
+            // Server chooses not to handle absolute (remote) references
+            _missingReferenceIssue = ReferenceNotResolvedIssue(reference, false);
             return (false, null, reference);
         }
 
@@ -228,6 +231,11 @@ namespace Vonk.Plugin.DocumentOperation
                 return (false, null, reference);
 
             return (true, result.ToPoco<Resource>(), String.Empty);
+        }
+
+        private bool IsRelativeUrl(string reference)
+        {
+            return Uri.IsWellFormedUriString(reference, UriKind.Relative);
         }
 
         #endregion Helper - Resolve resources
@@ -242,23 +250,33 @@ namespace Vonk.Plugin.DocumentOperation
             response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
         }
 
-        private void CancelDocumentOperation(IVonkResponse response, int statusCode, IssueComponent issue = null)
+        private void CancelDocumentOperation(IVonkResponse response, int statusCode)
         {
             response.HttpResult = statusCode;
-            if(issue != null)
-                response.Outcome.AddIssue(issue);
+            if(_missingReferenceIssue != null)
+                response.Outcome.AddIssue(_missingReferenceIssue);
         }
 
         #endregion Helper - Return response
 
-        private IssueComponent LocalReferenceNotResolvedIssue(string failedReference)
+        private IssueComponent ReferenceNotResolvedIssue(string failedReference, bool missingReferenceIsLocal)
         {
             var issue = new OperationOutcome.IssueComponent()
             {
-                Code = IssueType.NotFound,
                 Severity = IssueSeverity.Error,
-                Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference)
             };
+
+            if (missingReferenceIsLocal)
+            {
+                issue.Code = IssueType.NotFound;
+                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference);
+            }
+            else
+            {
+                issue.Code = IssueType.NotSupported;
+                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_EXTERNAL_FAIL", "Resolving external resource references (" + failedReference + ") is not supported");
+            }
+
             return issue;
         }
 
