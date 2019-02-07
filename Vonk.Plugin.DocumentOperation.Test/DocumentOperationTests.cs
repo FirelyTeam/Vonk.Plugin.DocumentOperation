@@ -11,7 +11,7 @@ using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
-using List = System.Collections.Generic.List<Vonk.Core.Common.IResource>;
+using System.Collections.Generic;
 using Vonk.Fhir.R3;
 using Vonk.Core.Context.Features;
 using Vonk.Core.Support;
@@ -46,7 +46,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
-            var searchResult = new SearchResult(new List() { composition }, 1, 1);
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
             // Create VonkContext for $document (GET / Instance level)
@@ -74,7 +74,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
-            var searchResult = new SearchResult(new List() { composition }, 1, 1);
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
             // Create VonkContext for $document (POST / Type level)
@@ -109,7 +109,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
-            var searchResult = new SearchResult(new List() { composition }, 1, 1);
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
             // Create VonkContext for $document (POST / Type level)
@@ -136,7 +136,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Let ISearchRepository return no Composition
             var composition = CreateTestCompositionNoReferences();
-            var searchResult = new SearchResult(new List() , 0, 0);
+            var searchResult = new SearchResult(new List<IResource>() , 0, 0);
             _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
             // Create VonkContext for $document (GET / Instance level)
@@ -161,7 +161,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
-            var searchResult = new SearchResult(new List() { composition }, 1, 1);
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
             // Create VonkContext for $document (GET / Instance level)
@@ -186,7 +186,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionInclPatient(); // Unresolvable reference (patient resource) in the composition resource (1. level)
-            var compositionSearchResult = new SearchResult(new List() { composition }, 1, 1);
+            var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
 
             // Create VonkContext for $document (GET / Instance level)
@@ -211,10 +211,10 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionInclPatient(); // Unresolvable reference (Practitioner resource) in patient resource (2. level)
-            var compositionSearchResult = new SearchResult(new List() { composition }, 1, 1);
+            var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
 
             var patient = CreateTestPatient();
-            var patientSearchResult = new SearchResult(new List() { patient }, 1, 1);
+            var patientSearchResult = new SearchResult(new List<IResource>() { patient }, 1, 1);
 
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Patient")), It.IsAny<SearchOptions>())).ReturnsAsync(patientSearchResult);
@@ -241,13 +241,13 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionInclList(); // Unresolvable reference (Medication resource) in MedicationStatement resource (4. level)
-            var compositionSearchResult = new SearchResult(new List() { composition }, 1, 1);
+            var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
 
             var list = CreateTestList();
-            var listSearchResults = new SearchResult(new List { list }, 1, 1);
+            var listSearchResults = new SearchResult(new List<IResource>{ list }, 1, 1);
 
             var medcationStatement = CreateTestMedicationStatement();
-            var medcationStatementSearchResult = new SearchResult(new List() { medcationStatement }, 1, 1);
+            var medcationStatementSearchResult = new SearchResult(new List<IResource>() { medcationStatement }, 1, 1);
 
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("List")), It.IsAny<SearchOptions>())).ReturnsAsync(listSearchResults);
@@ -275,16 +275,16 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionInclList(); // Unresolvable reference (Medication resource) in MedicationStatement resource (4. level)
-            var compositionSearchResult = new SearchResult(new List() { composition }, 1, 1);
+            var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
 
             var list = CreateTestList();
-            var listSearchResults = new SearchResult(new List { list }, 1, 1);
+            var listSearchResults = new SearchResult(new List<IResource>{ list }, 1, 1);
 
             var medcationStatement = CreateTestMedicationStatement();
-            var medcationStatementSearchResult = new SearchResult(new List() { medcationStatement }, 1, 1);
+            var medcationStatementSearchResult = new SearchResult(new List<IResource>() { medcationStatement }, 1, 1);
 
             var medication = CreateTestMedication();
-            var medicationSearchResult = new SearchResult(new List { medication }, 1, 1);
+            var medicationSearchResult = new SearchResult(new List<IResource>{ medication }, 1, 1);
 
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("List")), It.IsAny<SearchOptions>())).ReturnsAsync(listSearchResults);
@@ -313,7 +313,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionAbsoulteReferences(); // External reference (patient resource) in the composition resource
-            var compositionSearchResult = new SearchResult(new List() { composition }, 1, 1);
+            var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
 
             // Create VonkContext for $document (GET / Instance level)
