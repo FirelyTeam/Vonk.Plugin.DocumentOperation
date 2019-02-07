@@ -1,7 +1,7 @@
 # $document operation for Vonk FHIR server
 
 This repository implements a plug-in for the Vonk FHIR server [(vonk.fire.ly)](vonk.fire.ly).<br>
-It provides the $document operation defined by the FHIR standard. For more information see [[1]](https://www.hl7.org/fhir/operation-composition-document.html).
+It provides the $document operation defined by the FHIR standard (STU3). For more information see [[1]](https://www.hl7.org/fhir/operation-composition-document.html).
 
 ## Getting Started
 
@@ -22,8 +22,9 @@ The following configuration has been succesfully tested for building and running
 ## Limitations
 
 Currently the following limitations exist in the implemenation:
-* No digital signature is added on the created document.
+* No digital signature is added on the created document
 * Absolute (remote) references are not included in a document
+* \_graph parameter is not implemented
 
 ## Tests
 
