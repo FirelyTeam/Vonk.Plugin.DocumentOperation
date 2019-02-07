@@ -223,22 +223,11 @@ namespace Vonk.Plugin.DocumentOperation
 
         private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveLocalResource(string reference)
         {
-            try
-            {
-                var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
-                if (result == null)
-                    return (false, null, reference);
+            var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
+            if (result == null)
+                return (false, null, reference);
 
-                var resource = result.ToPoco<Resource>();
-                return (true, result.ToPoco<Resource>(), String.Empty);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("");
-            }
-
-            return (false, null, null);
-
+            return (true, result.ToPoco<Resource>(), String.Empty);
         }
 
         #endregion Helper - Resolve resources
