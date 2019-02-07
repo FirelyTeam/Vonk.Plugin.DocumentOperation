@@ -16,6 +16,7 @@ using Vonk.Fhir.R3;
 using Vonk.Core.Context.Features;
 using Vonk.Core.Support;
 using static Hl7.Fhir.Model.Bundle;
+using System.Linq;
 
 namespace Vonk.Plugin.DocumentOperation.Test
 {
@@ -184,10 +185,14 @@ namespace Vonk.Plugin.DocumentOperation.Test
         [Fact]
         public async Task DocumentOperationInternalServerErrorOnMissingReference1()
         {
+            var resourceToBeFound = new List<string> { "Composition" };
+
             // Setup Composition resource
             var composition = CreateTestCompositionInclPatient(); // Unresolvable reference (patient resource) in the composition resource (1. level)
             var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+        
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
+            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => !resourceToBeFound.Contains(arg.GetArgument("_type").ArgumentValue)), It.IsAny<SearchOptions>())).ReturnsAsync(new SearchResult(Enumerable.Empty<IResource>(), 0, 0)); // -> GetBeyKey returns null
 
             // Create VonkContext for $document (GET / Instance level)
             var testContext = new VonkTestContext(VonkInteraction.instance_custom);
@@ -209,6 +214,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
         [Fact]
         public async Task DocumentOperationInternalServerErrorOnMissingReference2()
         {
+            var resourceToBeFound = new List<string> { "Composition", "Patient" };
+
             // Setup Composition resource
             var composition = CreateTestCompositionInclPatient(); // Unresolvable reference (Practitioner resource) in patient resource (2. level)
             var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
@@ -218,6 +225,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Patient")), It.IsAny<SearchOptions>())).ReturnsAsync(patientSearchResult);
+            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => !resourceToBeFound.Contains(arg.GetArgument("_type").ArgumentValue)), It.IsAny<SearchOptions>())).ReturnsAsync(new SearchResult(Enumerable.Empty<IResource>(), 0, 0)); // -> GetBeyKey returns null
 
             // Create VonkContext for $document (GET / Instance level)
             var testContext = new VonkTestContext(VonkInteraction.instance_custom);
@@ -239,6 +247,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
         [Fact]
         public async Task DocumentOperationInternalServerErrorOnMissingReference3()
         {
+            var resourceToBeFound = new List<string> { "Composition", "List", "MedicationStatement" };
+
             // Setup Composition resource
             var composition = CreateTestCompositionInclList(); // Unresolvable reference (Medication resource) in MedicationStatement resource (4. level)
             var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
@@ -252,6 +262,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("List")), It.IsAny<SearchOptions>())).ReturnsAsync(listSearchResults);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("MedicationStatement")), It.IsAny<SearchOptions>())).ReturnsAsync(medcationStatementSearchResult);
+            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => !resourceToBeFound.Contains(arg.GetArgument("_type").ArgumentValue)), It.IsAny<SearchOptions>())).ReturnsAsync(new SearchResult(Enumerable.Empty<IResource>(), 0, 0)); // -> GetBeyKey returns null
 
             // Create VonkContext for $document (GET / Instance level)
             var testContext = new VonkTestContext(VonkInteraction.instance_custom);
