@@ -4,6 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <OutputType>Library</OutputType>
+    <Version>1.1.0</Version>
+    <Authors>Firely - Alexander Zautke, Christiaan Knapp, Marco Visser</Authors>
+    <Company>Firely</Company>
   </PropertyGroup>
 
   <ItemGroup>
