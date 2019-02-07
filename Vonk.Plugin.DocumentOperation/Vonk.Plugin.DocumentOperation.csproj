@@ -1,15 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <OutputType>Library</OutputType>
+    <Version>1.1.0</Version>
+    <Authors>Firely - Alexander Zautke, Christiaan Knapp, Marco Visser</Authors>
+    <Company>Firely</Company>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Vonk.Core" Version="1.0.0" />
-    <PackageReference Include="Hl7.Fhir.STU3" Version="0.96.0" />
-    <PackageReference Include="Vonk.Fhir.R3" Version="1.0.0" />
+    <PackageReference Include="Vonk.Core" Version="1.1.0" />
+    <PackageReference Include="Hl7.Fhir.STU3" Version="1.1.2" />
+    <PackageReference Include="Vonk.Fhir.R3" Version="1.1.0" />
   </ItemGroup>
 
   <ItemGroup>
