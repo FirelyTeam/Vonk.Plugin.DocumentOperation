@@ -1,5 +1,7 @@
-﻿using Hl7.Fhir.Model;
+﻿using Hl7.Fhir.ElementModel;
+using Hl7.Fhir.Model;
 using Hl7.Fhir.Support;
+using Hl7.FhirPath;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -154,7 +156,7 @@ namespace Vonk.Plugin.DocumentOperation
             var vonkResource = resource.ToIResource();
             var resourceType = vonkResource.Type;
             var allReferencesInResourceQuery = "$this.descendants().where($this is Reference).reference";
-            var references = vonkResource.Navigator.Select(allReferencesInResourceQuery);
+            var references = vonkResource.Navigator.ToTypedElement().Select(allReferencesInResourceQuery);
 
             // Resolve references
             // Skip the following resources: 
@@ -224,16 +226,11 @@ namespace Vonk.Plugin.DocumentOperation
 
         private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveLocalResource(string reference)
         {
-            try
-            {
-                var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
-                var resource = result.ToPoco<Resource>();
-                return (true, resource, String.Empty);
-            }
-            catch{
-                _missingReferenceIssue = ReferenceNotResolvedIssue(reference, true);
+            var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
+            if (result == null)
                 return (false, null, reference);
-            }
+
+            return (true, result.ToPoco<Resource>(), String.Empty);
         }
 
         private bool IsRelativeUrl(string reference)
