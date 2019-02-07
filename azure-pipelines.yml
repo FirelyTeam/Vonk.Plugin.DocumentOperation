@@ -19,12 +19,6 @@ steps:
      **/*.Test/*.csproj
     arguments: '--configuration $(BuildConfiguration)  --no-restore --no-build'
 
-- task: PublishTestResults@2
-  condition: succeededOrFailed()
-  inputs:
-    testRunner: VSTest
-    testResultsFiles: '**/*.trx'
-
 - script: |
     dotnet publish --configuration $(buildConfiguration) --output $BUILD_ARTIFACTSTAGINGDIRECTORY
 
