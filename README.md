@@ -42,7 +42,8 @@ To test the operation:
 - Inspect the result for the id that the Composition resource got.
 - Generate a document with ``GET [base]/Composition/[id]/$document``
 
-A Postman collection for all these requests can be found in the 'data' folder.
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/6a3f2f12be33497527c4)
+The Postman collection for all the requests mentioned above can also be found in the 'data' folder.
 
 ## License
 
