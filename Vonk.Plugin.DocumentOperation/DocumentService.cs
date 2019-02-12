@@ -1,4 +1,4 @@
-﻿using Hl7.Fhir.ElementModel;
+using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Support;
 using Hl7.FhirPath;
@@ -269,12 +269,12 @@ namespace Vonk.Plugin.DocumentOperation
             if (missingReferenceIsLocal)
             {
                 issue.Code = IssueType.NotFound;
-                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_LOCAL_FAIL", "Unable to resolve local reference to resource " + failedReference);
+                issue.Details = new CodeableConcept("http://vonk.fire.ly/fhir/ValueSet/OperationOutcomeIssueDetails", "MSG_LOCAL_FAIL", $"Unable to resolve local reference to resource {failedReference}");
             }
             else
             {
                 issue.Code = IssueType.NotSupported;
-                issue.Details = new CodeableConcept("http://hl7.org/fhir/ValueSet/operation-outcome", "MSG_EXTERNAL_FAIL", "Resolving external resource references (" + failedReference + ") is not supported");
+                issue.Details = new CodeableConcept("http://vonk.fire.ly/fhir/ValueSet/OperationOutcomeIssueDetails", "MSG_EXTERNAL_FAIL", $"Resolving external resource references ({failedReference}) is not supported");
             }
 
             return issue;
