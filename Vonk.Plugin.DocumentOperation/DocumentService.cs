@@ -228,7 +228,10 @@ namespace Vonk.Plugin.DocumentOperation
         {
             var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
             if (result == null)
+            {
+                _missingReferenceIssue = ReferenceNotResolvedIssue(reference, true);
                 return (false, null, reference);
+            }
 
             return (true, result.ToPoco<Resource>(), String.Empty);
         }
