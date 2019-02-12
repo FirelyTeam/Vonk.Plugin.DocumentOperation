@@ -43,6 +43,7 @@ To test the operation:
 - Generate a document with ``GET [base]/Composition/[id]/$document``
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/6a3f2f12be33497527c4)
+
 The Postman collection for all the requests mentioned above can also be found in the 'data' folder.
 
 ## License
