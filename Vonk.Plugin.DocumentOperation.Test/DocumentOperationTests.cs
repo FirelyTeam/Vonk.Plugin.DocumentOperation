@@ -17,6 +17,7 @@ using Vonk.Core.Context.Features;
 using Vonk.Core.Support;
 using System.Linq;
 using Vonk.Core.ElementModel;
+using Hl7.Fhir.Specification;
 
 namespace Vonk.Plugin.DocumentOperation.Test
 {
@@ -36,10 +37,11 @@ namespace Vonk.Plugin.DocumentOperation.Test
         private ILogger<DocumentService> _logger = Logger<DocumentService>();
         private Mock<ISearchRepository> _searchMock = new Mock<ISearchRepository>();
         private Mock<IResourceChangeRepository> _changeMock = new Mock<IResourceChangeRepository>();
+        private IStructureDefinitionSummaryProvider _schemaProvider = new PocoStructureDefinitionSummaryProvider();
 
         public DocumentOperationTests()
         {
-            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _logger);
+            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _schemaProvider, _logger);
         }
 
         [Fact]
