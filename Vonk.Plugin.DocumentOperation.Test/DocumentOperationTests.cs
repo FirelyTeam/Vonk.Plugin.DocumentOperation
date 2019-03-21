@@ -15,8 +15,8 @@ using System.Collections.Generic;
 using Vonk.Fhir.R3;
 using Vonk.Core.Context.Features;
 using Vonk.Core.Support;
-using static Hl7.Fhir.Model.Bundle;
 using System.Linq;
+using Vonk.Core.ElementModel;
 
 namespace Vonk.Plugin.DocumentOperation.Test
 {
@@ -66,8 +66,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should succeed with HTTP 200 - OK on test composition");
             testContext.Response.Payload.Should().NotBeNull();
-            var document = testContext.Response.Payload.ToPoco<Bundle>();
-            document.Type.Should().Be(BundleType.Document);
+            var bundleType = testContext.Response.Payload.SelectText("type");
+            bundleType.Should().Be("document");
         }
 
         [Fact]
@@ -101,8 +101,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should succeed with HTTP 200 - OK on test composition");
             testContext.Response.Payload.Should().NotBeNull();
-            var document = testContext.Response.Payload.ToPoco<Bundle>();
-            document.Type.Should().Be(BundleType.Document);
+            var bundleType = testContext.Response.Payload.SelectText("type");
+            bundleType.Should().Be("document");
         }
 
         [Fact]
