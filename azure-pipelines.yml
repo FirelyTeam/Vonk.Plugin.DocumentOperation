@@ -23,7 +23,3 @@ steps:
     dotnet publish --configuration $(buildConfiguration) --output $BUILD_ARTIFACTSTAGINGDIRECTORY
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: plugin.dll' 
-  inputs:
-    PathtoPublish: '$(Build.StagingDirectory)/pub/plugin'
-    ArtifactName: DocumentOperation.dll
