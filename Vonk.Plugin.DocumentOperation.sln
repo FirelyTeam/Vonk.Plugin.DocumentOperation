@@ -1,9 +1,15 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vonk.Plugin.DocumentOperation", "Vonk.Plugin.DocumentOperation\Vonk.Plugin.DocumentOperation.csproj", "{234F788D-2198-4BD1-88DA-509F50B86AEE}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28721.148
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vonk.Plugin.DocumentOperation", "Vonk.Plugin.DocumentOperation\Vonk.Plugin.DocumentOperation.csproj", "{234F788D-2198-4BD1-88DA-509F50B86AEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vonk.Plugin.DocumentOperation.Test", "Vonk.Plugin.DocumentOperation.Test\Vonk.Plugin.DocumentOperation.Test.csproj", "{E7D12F44-6DE4-4A23-AB4D-67038A6799C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vonk.Plugin.DocumentOperation.Test", "Vonk.Plugin.DocumentOperation.Test\Vonk.Plugin.DocumentOperation.Test.csproj", "{E7D12F44-6DE4-4A23-AB4D-67038A6799C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C367A354-F5E0-474F-8E7B-9E541D716CB6}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,5 +25,11 @@ Global
 		{E7D12F44-6DE4-4A23-AB4D-67038A6799C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7D12F44-6DE4-4A23-AB4D-67038A6799C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7D12F44-6DE4-4A23-AB4D-67038A6799C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2FE4E2D7-8624-4CF3-A974-0C3E64266C95}
 	EndGlobalSection
 EndGlobal
