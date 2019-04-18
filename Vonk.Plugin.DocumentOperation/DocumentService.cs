@@ -1,5 +1,6 @@
 using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Model;
+using Hl7.Fhir.Specification;
 using Hl7.Fhir.Support;
 using Hl7.FhirPath;
 using Microsoft.AspNetCore.Http;
@@ -24,17 +25,19 @@ namespace Vonk.Plugin.DocumentOperation
     {
         private readonly ISearchRepository _searchRepository;
         private readonly IResourceChangeRepository _changeRepository;
+        private readonly IStructureDefinitionSummaryProvider _schemaProvider;
         private readonly ILogger<DocumentService> _logger;
 
         private IssueComponent _missingReferenceIssue;
 
-        public DocumentService(ISearchRepository searchRepository, IResourceChangeRepository changeRepository, ILogger<DocumentService> logger)
+        public DocumentService(ISearchRepository searchRepository, IResourceChangeRepository changeRepository, IStructureDefinitionSummaryProvider schemaProvider, ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
             Check.NotNull(changeRepository, nameof(changeRepository));
             Check.NotNull(logger, nameof(logger));
             _searchRepository = searchRepository;
             _changeRepository = changeRepository;
+            _schemaProvider = schemaProvider;
             _logger = logger;
         }
 
@@ -156,7 +159,7 @@ namespace Vonk.Plugin.DocumentOperation
             var vonkResource = resource.ToIResource();
             var resourceType = vonkResource.Type;
             var allReferencesInResourceQuery = "$this.descendants().where($this is Reference).reference";
-            var references = vonkResource.Navigator.ToTypedElement().Select(allReferencesInResourceQuery);
+            var references = vonkResource.ToTypedElement(_schemaProvider).Select(allReferencesInResourceQuery);
 
             // Resolve references
             // Skip the following resources: 

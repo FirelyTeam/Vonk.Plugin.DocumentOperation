@@ -16,7 +16,7 @@ For instructon on how to run the plug-in and the Vonk server, please see the off
 The following configuration has been succesfully tested for building and running the project:
 * Vonk FHIR server - Version 1.1.0
 * Visual Studio for Mac - Version 7.7.*
-* Visual Studio for Windows - Version 15.*.*
+* Visual Studio for Windows - Version 15.\*.*
 * .Net Core - Version 2.0
 
 ## Limitations
@@ -42,7 +42,9 @@ To test the operation:
 - Inspect the result for the id that the Composition resource got.
 - Generate a document with ``GET [base]/Composition/[id]/$document``
 
-A Postman collection for all these requests can be found in the 'data' folder.
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/2c5da2fa4dd4cb83dddf)
+
+The Postman collection for all the requests mentioned above can also be found in the 'data' folder.
 
 ## License
 
