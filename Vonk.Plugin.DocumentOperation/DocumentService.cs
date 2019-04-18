@@ -152,7 +152,6 @@ namespace Vonk.Plugin.DocumentOperation
         private async Task<(bool success, IssueComponent failedReference)> IncludeReferencesInBundle(IResource resource, GenericBundle documentBundle, HashSet<string> includedReferences)
         {
             // Get references of given resource
-            var resourceType = resource.Type;
             var allReferencesInResourceQuery = "$this.descendants().where($this is Reference).reference";
             var references = resource.ToTypedElement(_schemaProvider).Select(allReferencesInResourceQuery);
 
