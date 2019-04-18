@@ -28,8 +28,6 @@ namespace Vonk.Plugin.DocumentOperation
         private readonly IStructureDefinitionSummaryProvider _schemaProvider;
         private readonly ILogger<DocumentService> _logger;
 
-        private IssueComponent _missingReferenceIssue;
-
         public DocumentService(ISearchRepository searchRepository, IResourceChangeRepository changeRepository, IStructureDefinitionSummaryProvider schemaProvider, ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
@@ -60,7 +58,7 @@ namespace Vonk.Plugin.DocumentOperation
             if (request.GetRequiredPayload(response, out var parameters))
             {
                 var parametersResource = parameters.ToPoco<Parameters>();
-                var compositionID = parametersResource?.Parameter.Where(p => p.Name == "id").FirstOrDefault()?.Value?.ToString();
+                var compositionID = parametersResource?.Parameter.FirstOrDefault(p => p.Name == "id")?.Value?.ToString();
                 if (string.IsNullOrEmpty(compositionID))
                 {
                     response.HttpResult = StatusCodes.Status400BadRequest;
@@ -90,21 +88,20 @@ namespace Vonk.Plugin.DocumentOperation
             var documentBundle = CreateEmptyBundle();
 
             // Get Composition resource
-            (bool compositionResolved, Resource resolvedResource, string failedReference) = await ResolveResource(compositionID, "Composition");
+            (var compositionResolved, var resolvedResource, var failedReference) = await ResolveResource(compositionID, "Composition");
             if (compositionResolved)
             {
                 // Include Composition resource in search results
                 documentBundle.AddResourceEntry(resolvedResource, "Composition/" + compositionID);
 
                 // Recursively resolve and include all references in the search bundle
-                bool includedResourcesResolved;
-                (includedResourcesResolved, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
+                (_, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
             }
 
             // Handle responses
             IVonkResponse response = vonkContext.Response;
             vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
-            if (!failedReference.Equals(string.Empty))
+            if (!(failedReference is null))
             {
                 if (!compositionResolved) // Composition resource, on which the operation is called, does not exist
                 {
@@ -113,7 +110,7 @@ namespace Vonk.Plugin.DocumentOperation
                 }
                 else // Local or external reference reference could not be found
                 {
-                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError);
+                    CancelDocumentOperation(response, StatusCodes.Status500InternalServerError, failedReference);
                 }
                 return;
             }
@@ -140,7 +137,7 @@ namespace Vonk.Plugin.DocumentOperation
         /// - success describes if all references could recursively be found, starting from the given resource
         /// - failedReference contains the first reference that could not be resolved, empty if all resources can be resolved
         /// </returns>
-        private async Task<(bool success, string failedReference)> IncludeReferencesInBundle(Resource startResource, Bundle searchBundle)
+        private async Task<(bool success, IssueComponent failedReference)> IncludeReferencesInBundle(Resource startResource, Bundle searchBundle)
         {
             var includedReferences = new HashSet<string>();
             return await IncludeReferencesInBundle(startResource, searchBundle, includedReferences);
@@ -153,7 +150,7 @@ namespace Vonk.Plugin.DocumentOperation
         /// <param name="documentBundle"></param>
         /// <param name="includedReferences">Remember which resources were already added to the search bundle</param>
         /// <returns></returns>
-        private async Task<(bool success, string failedReference)> IncludeReferencesInBundle(Resource resource, Bundle documentBundle, HashSet<string> includedReferences)
+        private async Task<(bool success, IssueComponent failedReference)> IncludeReferencesInBundle(Resource resource, Bundle documentBundle, HashSet<string> includedReferences)
         {
             // Get references of given resource
             var vonkResource = resource.ToIResource();
@@ -165,7 +162,7 @@ namespace Vonk.Plugin.DocumentOperation
             // Skip the following resources: 
             //    - Contained resources as they are already included through their parents
             //    - Resources that are already included in the search bundle
-            (bool successfulResolve, Resource resolvedResource, string failedReference) = (true, null, String.Empty);
+            (bool successfulResolve, Resource resolvedResource, IssueComponent failedReference) = (true, null, null);
             foreach (var reference in references)
             {
                 var referenceValue = reference.Value.ToString();
@@ -209,34 +206,27 @@ namespace Vonk.Plugin.DocumentOperation
 
         #region Helper - Resolve resources
 
-        private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveResource(string id, string type)
+        private async Task<(bool success, Resource resolvedResource, IssueComponent failedReference)> ResolveResource(string id, string type)
         {
             return await ResolveResource(type + "/" + id);
         }
 
-        private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveResource(string reference)
+        private async Task<(bool success, Resource resolvedResource, IssueComponent failedReference)> ResolveResource(string reference)
         {
             if (IsRelativeUrl(reference))
-            {
-                (bool successfulResolve, Resource resource, string failedReference) = await ResolveLocalResource(reference);
-                return (successfulResolve, resource, failedReference);
-            }
+                return await ResolveLocalResource(reference);
 
             // Server chooses not to handle absolute (remote) references
-            _missingReferenceIssue = ReferenceNotResolvedIssue(reference, false);
-            return (false, null, reference);
+            return (false, null, ReferenceNotResolvedIssue(reference, false));
         }
 
-        private async Task<(bool success, Resource resolvedResource, string failedReference)> ResolveLocalResource(string reference)
+        private async Task<(bool success, Resource resolvedResource, IssueComponent failedReference)> ResolveLocalResource(string reference)
         {
             var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
             if (result == null)
-            {
-                _missingReferenceIssue = ReferenceNotResolvedIssue(reference, true);
-                return (false, null, reference);
-            }
+                return (false, null, ReferenceNotResolvedIssue(reference, true));
 
-            return (true, result.ToPoco<Resource>(), String.Empty);
+            return (true, result.ToPoco<Resource>(), null);
         }
 
         private bool IsRelativeUrl(string reference)
@@ -256,20 +246,20 @@ namespace Vonk.Plugin.DocumentOperation
             response.Headers.Add(VonkResultHeader.Location, searchBundleLocation);
         }
 
-        private void CancelDocumentOperation(IVonkResponse response, int statusCode)
+        private void CancelDocumentOperation(IVonkResponse response, int statusCode, IssueComponent failedReference = null)
         {
             response.HttpResult = statusCode;
-            if(_missingReferenceIssue != null)
-                response.Outcome.AddIssue(_missingReferenceIssue);
+            if(failedReference != null)
+                response.Outcome.AddIssue(failedReference);
         }
 
         #endregion Helper - Return response
 
         private IssueComponent ReferenceNotResolvedIssue(string failedReference, bool missingReferenceIsLocal)
         {
-            var issue = new OperationOutcome.IssueComponent()
+            var issue = new IssueComponent()
             {
-                Severity = IssueSeverity.Error,
+                Severity = IssueSeverity.Error
             };
 
             if (missingReferenceIsLocal)
