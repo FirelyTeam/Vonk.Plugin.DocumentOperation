@@ -3,9 +3,10 @@
 This repository implements a plug-in for the Vonk FHIR server [(vonk.fire.ly)](vonk.fire.ly).<br>
 It provides the $document operation defined by the FHIR standard (STU3). For more information see [[1]](https://www.hl7.org/fhir/operation-composition-document.html).
 
-[![Build Status Develop](https://dev.azure.com/firely/DocumentOperation/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=develop)](https://dev.azure.com/firely/DocumentOperation/_build/latest?definitionId=26&branchName=develop)
-
-[![Build Master](https://dev.azure.com/firely/DocumentOperation/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=master)](https://dev.azure.com/firely/DocumentOperation/_build/latest?definitionId=26&branchName=master)
+|STU3|R4|
+|---|---|
+|[![Build Status Develop](https://dev.azure.com/firely/DocumentOperation/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=develop)](https://dev.azure.com/firely/DocumentOperation/_build/latest?definitionId=26&branchName=develop)|
+|[![Build Master](https://dev.azure.com/firely/DocumentOperation/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=master)](https://dev.azure.com/firely/DocumentOperation/_build/latest?definitionId=26&branchName=master)|
 
 ## Getting Started
 
