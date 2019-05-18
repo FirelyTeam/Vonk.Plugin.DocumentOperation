@@ -350,6 +350,34 @@ namespace Vonk.Plugin.DocumentOperation.Test
             testContext.Response.Outcome.Issue.Count(issue => issue.Code == OperationOutcome.IssueType.NotSupported).Should().NotBe(0, "OperationOutcome should highlight that this feature is not supported");
         }
 
+        [Fact]
+        public async Task DocumentBundleContainsIdentifier()
+        {
+            // Setup Composition resource
+            var composition = CreateTestCompositionNoReferences();
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+
+            // Create VonkContext for $document (GET / Instance level)
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceId, "test")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "GET";
+
+            // Execute $document
+            await _documentService.DocumentInstanceGET(testContext);
+
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should succeed with HTTP 200 - OK on test composition");
+            testContext.Response.Payload.Should().NotBeNull();
+
+            var identifier = testContext.Response.Payload.SelectNodes("identifier");
+            identifier.Should().NotBeEmpty("A document SHALL contain at least one identifier");
+        }
+
         // $document is expected to fail if a resource reference is missing, this should be checked on all levels of recursion.
         // Therefore, we build multiple resources, each with different unresolvable references
 
