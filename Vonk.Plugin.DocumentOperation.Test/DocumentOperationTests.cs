@@ -290,7 +290,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         public async Task DocumentOperationSuccessCompleteComposition()
         {
             // Setup Composition resource
-            var composition = CreateTestCompositionInclList(); // Unresolvable reference (Medication resource) in MedicationStatement resource (4. level)
+            var composition = CreateTestCompositionInclList();
             var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
 
             var list = CreateTestList();
@@ -378,6 +378,12 @@ namespace Vonk.Plugin.DocumentOperation.Test
             identifier.Should().NotBeEmpty("A document SHALL contain at least one identifier");
         }
 
+        [Fact]
+        public async Task DocumentOperationCanIncludeCustomResources()
+        {
+
+        }
+
         // $document is expected to fail if a resource reference is missing, this should be checked on all levels of recursion.
         // Therefore, we build multiple resources, each with different unresolvable references
 
@@ -404,6 +410,11 @@ namespace Vonk.Plugin.DocumentOperation.Test
             composition.Section.Add(sectionComponent);
 
             return composition.ToIResource();
+        }
+
+        private IResource CreateTestCompositionInclCustomResource()
+        {
+            return new Composition() { Id = "test", VersionId = "v1", Subject = new ResourceReference("CustomResourceTest/test") }.ToIResource();
         }
 
         private IResource CreateTestPatient()
