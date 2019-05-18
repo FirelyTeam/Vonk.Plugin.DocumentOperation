@@ -27,7 +27,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             - (X) $document should persist the generated document on request
             - (X) $document should return an INVALID_REQUEST when being called with POST and an missing id
             - (X) $document should throw an internal server error if a local reference to a resource, which should be included in the document, can't be found.
-            - (X) $document should thrw an internal server error if an external reference is requested to be included in the document
+            - (X) $document should throw an internal server error if an external reference is requested to be included in the document
     */
 
     public class DocumentOperationTests
