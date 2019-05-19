@@ -322,6 +322,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should return HTTP 200 - OK when all references in the composition (incl. recursive references) can be resolved");
+            testContext.Response.Payload.SelectNodes("entry.resource").Count().Should().Be(4, "Expected Composition, List, MedicationStatement and Medication resources to be in the document");
         }
 
         [Fact]
