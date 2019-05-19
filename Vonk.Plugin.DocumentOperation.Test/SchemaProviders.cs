@@ -11,7 +11,7 @@ using Moq;
 using Vonk.Core.Context;
 using Vonk.Core.Operations.Validation;
 using Vonk.Core.Support;
-using static Vonk.Test.Utils.LoggerUtils;
+using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
 
 namespace Vonk.Test.Utils
 {
