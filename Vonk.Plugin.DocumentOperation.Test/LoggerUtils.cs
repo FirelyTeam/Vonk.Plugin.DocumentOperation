@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Vonk.Test.Utils
+namespace Vonk.Plugin.DocumentOperation.Test
 {
     public class LoggerUtils
     {
