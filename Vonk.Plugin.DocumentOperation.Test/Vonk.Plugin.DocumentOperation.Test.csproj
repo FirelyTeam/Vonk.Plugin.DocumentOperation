@@ -17,4 +17,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Vonk.Plugin.DocumentOperation\Vonk.Plugin.DocumentOperation.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\CustomBasic-StructureDefinition-R3.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\CustomBasic-StructureDefinition-R3.json" />
+  </ItemGroup>
 </Project>
