@@ -27,7 +27,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             - (X) $document should persist the generated document on request
             - (X) $document should return an INVALID_REQUEST when being called with POST and an missing id
             - (X) $document should throw an internal server error if a local reference to a resource, which should be included in the document, can't be found.
-            - (X) $document should thrw an internal server error if an external reference is requested to be included in the document
+            - (X) $document should throw an internal server error if an external reference is requested to be included in the document
     */
 
     public class DocumentOperationTests
@@ -290,7 +290,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         public async Task DocumentOperationSuccessCompleteComposition()
         {
             // Setup Composition resource
-            var composition = CreateTestCompositionInclList(); // Unresolvable reference (Medication resource) in MedicationStatement resource (4. level)
+            var composition = CreateTestCompositionInclList();
             var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
 
             var list = CreateTestList();
@@ -351,6 +351,40 @@ namespace Vonk.Plugin.DocumentOperation.Test
             testContext.Response.Outcome.Issue.Count(issue => issue.Code == OperationOutcome.IssueType.NotSupported).Should().NotBe(0, "OperationOutcome should highlight that this feature is not supported");
         }
 
+        [Fact]
+        public async Task DocumentBundleContainsIdentifier()
+        {
+            // Setup Composition resource
+            var composition = CreateTestCompositionNoReferences();
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+
+            // Create VonkContext for $document (GET / Instance level)
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceId, "test")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "GET";
+
+            // Execute $document
+            await _documentService.DocumentInstanceGET(testContext);
+
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should succeed with HTTP 200 - OK on test composition");
+            testContext.Response.Payload.Should().NotBeNull();
+
+            var identifier = testContext.Response.Payload.SelectNodes("identifier");
+            identifier.Should().NotBeEmpty("A document SHALL contain at least one identifier");
+        }
+
+        [Fact]
+        public async Task DocumentOperationCanIncludeCustomResources()
+        {
+
+        }
+
         // $document is expected to fail if a resource reference is missing, this should be checked on all levels of recursion.
         // Therefore, we build multiple resources, each with different unresolvable references
 
@@ -377,6 +411,11 @@ namespace Vonk.Plugin.DocumentOperation.Test
             composition.Section.Add(sectionComponent);
 
             return composition.ToIResource();
+        }
+
+        private IResource CreateTestCompositionInclCustomResource()
+        {
+            return new Composition() { Id = "test", VersionId = "v1", Subject = new ResourceReference("CustomResourceTest/test") }.ToIResource();
         }
 
         private IResource CreateTestPatient()

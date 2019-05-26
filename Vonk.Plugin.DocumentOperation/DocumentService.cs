@@ -188,8 +188,16 @@ namespace Vonk.Plugin.DocumentOperation
 
         private GenericBundle CreateEmptyBundle()
         {
-            var documentBundle = GenericBundle.FromBundle(SourceNode.Resource("Bundle", "Bundle", SourceNode.Valued("type", "document")));
+            var bundleResourceNode = SourceNode.Resource("Bundle", "Bundle", SourceNode.Valued("type", "document"));
+
+            var identifier = SourceNode.Node("identifier");
+            identifier.Add(SourceNode.Valued("system", "urn:ietf:rfc:3986"));
+            identifier.Add(SourceNode.Valued("value", Guid.NewGuid().ToString()));
+            bundleResourceNode.Add(identifier);
+
+            var documentBundle = GenericBundle.FromBundle(bundleResourceNode);
             documentBundle.Meta(Guid.NewGuid().ToString(), DateTimeOffset.Now);
+
             return documentBundle;
         }
 
