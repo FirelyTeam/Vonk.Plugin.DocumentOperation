@@ -31,8 +31,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
         public CustomResourcesInDocumentTests()
         {
-            var reader = new TestResourceReader();
-            var customBasicStructureDefinitionJson = reader.GetResourceAsString("CustomBasic-StructureDefinition-R3.json");
+            var customBasicStructureDefinitionJson = TestResourceReader.ReadTestData("CustomBasic-StructureDefinition-R3.json");
             var customBasicStructureDefinition = new FhirJsonParser().Parse<StructureDefinition>(customBasicStructureDefinitionJson);
 
             _schemaProvider = SchemaProviders.CreateCustomSchemaProvider(customBasicStructureDefinition);
