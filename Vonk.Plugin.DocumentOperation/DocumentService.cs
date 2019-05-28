@@ -91,10 +91,10 @@ namespace Vonk.Plugin.DocumentOperation
             if (compositionResolved)
             {
                 // Include Composition resource in search results
-                documentBundle.AddEntry(resolvedResource, "Composition/" + compositionID);
+                documentBundle = documentBundle.AddEntry(resolvedResource, "Composition/" + compositionID);
 
-                // Recursively resolve and include all references in the search bundle
-                (_, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
+                // Recursively resolve and include all references in the search bundle, overwrite documentBundle as GenericBundle is immutable
+                (_, documentBundle, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
             }
 
             // Handle responses
@@ -136,7 +136,7 @@ namespace Vonk.Plugin.DocumentOperation
         /// - success describes if all references could recursively be found, starting from the given resource
         /// - failedReference contains the first reference that could not be resolved, empty if all resources can be resolved
         /// </returns>
-        private async Task<(bool success, IssueComponent failedReference)> IncludeReferencesInBundle(IResource startResource, GenericBundle searchBundle)
+        private async Task<(bool success, GenericBundle documentBundle, IssueComponent failedReference)> IncludeReferencesInBundle(IResource startResource, GenericBundle searchBundle)
         {
             var includedReferences = new HashSet<string>();
             return await IncludeReferencesInBundle(startResource, searchBundle, includedReferences);
@@ -149,7 +149,7 @@ namespace Vonk.Plugin.DocumentOperation
         /// <param name="documentBundle"></param>
         /// <param name="includedReferences">Remember which resources were already added to the search bundle</param>
         /// <returns></returns>
-        private async Task<(bool success, IssueComponent failedReference)> IncludeReferencesInBundle(IResource resource, GenericBundle documentBundle, HashSet<string> includedReferences)
+        private async Task<(bool success, GenericBundle documentBundle, IssueComponent failedReference)> IncludeReferencesInBundle(IResource resource, GenericBundle documentBundle, HashSet<string> includedReferences)
         {
             // Get references of given resource
             var allReferencesInResourceQuery = "$this.descendants().where($this is Reference).reference";
@@ -167,7 +167,7 @@ namespace Vonk.Plugin.DocumentOperation
                 {
                     (successfulResolve, resolvedResource, failedReference) = await ResolveResource(referenceValue);
                     if(successfulResolve){
-                        documentBundle.AddEntry(resolvedResource, referenceValue);
+                        documentBundle = documentBundle.AddEntry(resolvedResource, referenceValue);
                         includedReferences.Add(referenceValue);
                     }
                     else{
@@ -175,13 +175,13 @@ namespace Vonk.Plugin.DocumentOperation
                     }
 
                     // Recursively resolve all references in the included resource
-                    (successfulResolve, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle, includedReferences);
+                    (successfulResolve, documentBundle, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle, includedReferences);
                     if(!successfulResolve){
                         break;
                     }
                 }
             }
-            return (successfulResolve, failedReference);
+            return (successfulResolve, documentBundle, failedReference);
         }
 
         #region Helper - Bundle-related

@@ -17,4 +17,15 @@
   <ItemGroup>
     <ProjectReference Include="..\Vonk.Plugin.DocumentOperation\Vonk.Plugin.DocumentOperation.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\CustomBasic-StructureDefinition-R3.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="TestData\CustomBasic-StructureDefinition-R3.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
