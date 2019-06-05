@@ -13,7 +13,6 @@ using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.Context.Features;
 using Vonk.Core.ElementModel;
-using Vonk.Core.Pluggability;
 using Vonk.Core.Repository;
 using Vonk.Core.Support;
 using static Hl7.Fhir.Model.OperationOutcome;
@@ -44,14 +43,12 @@ namespace Vonk.Plugin.DocumentOperation
         /// </summary>
         /// <param name="vonkContext">IVonkContext for details of the request and providing the response</param>
         /// <returns></returns>
-        [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "GET", AcceptedTypes = new string[] { "Composition" })]
         public async Task DocumentInstanceGET(IVonkContext vonkContext)
         {
             var compositionID = vonkContext.Arguments.ResourceIdArgument().ArgumentValue;
             await Document(vonkContext, compositionID);
         }
 
-        [InteractionHandler(VonkInteraction.type_custom, CustomOperation = "document", Method = "POST", AcceptedTypes = new string[] { "Composition" })]
         public async Task DocumentTypePOST(IVonkContext context)
         {
             var (request, args, response) = context.Parts();
@@ -166,17 +163,20 @@ namespace Vonk.Plugin.DocumentOperation
                 if (!referenceValue.StartsWith("#", StringComparison.Ordinal) && !includedReferences.Contains(referenceValue))
                 {
                     (successfulResolve, resolvedResource, failedReference) = await ResolveResource(referenceValue);
-                    if(successfulResolve){
+                    if (successfulResolve)
+                    {
                         documentBundle = documentBundle.AddEntry(resolvedResource, referenceValue);
                         includedReferences.Add(referenceValue);
                     }
-                    else{
+                    else
+                    {
                         break;
                     }
 
                     // Recursively resolve all references in the included resource
                     (successfulResolve, documentBundle, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle, includedReferences);
-                    if(!successfulResolve){
+                    if (!successfulResolve)
+                    {
                         break;
                     }
                 }
@@ -247,7 +247,7 @@ namespace Vonk.Plugin.DocumentOperation
         private void CancelDocumentOperation(IVonkResponse response, int statusCode, IssueComponent failedReference = null)
         {
             response.HttpResult = statusCode;
-            if(failedReference != null)
+            if (failedReference != null)
                 response.Outcome.AddIssue(failedReference);
         }
 
