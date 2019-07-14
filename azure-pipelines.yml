@@ -22,9 +22,3 @@ steps:
     projects: |
      **/*.Test/*.csproj
     arguments: '--configuration $(BuildConfiguration)  --no-restore --no-build'
-
-- task: PublishPipelineArtifact@0
-  displayName: 'Publish Artifact: plugin.dll' 
-  inputs:
-    targetPath: 'Vonk.Plugin.DocumentOperation/bin/Release/netstandard2.0'
-    artifactName: DocumentOperation
