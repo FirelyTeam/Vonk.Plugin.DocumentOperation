@@ -18,10 +18,10 @@ For instructon on how to run the plug-in and the Vonk server, please see the off
 
 ### Build dependencies
 The following configuration has been succesfully tested for building and running the project:
-* Vonk FHIR server - Version 1.1.0
-* Visual Studio for Mac - Version 7.7.*
-* Visual Studio for Windows - Version 15.\*.*
-* .Net Core - Version 2.0
+* Vonk FHIR server - Version 2.0.1
+* Visual Studio for Mac - Version 8.x.x
+* Visual Studio for Windows - Version 16.x.x
+* .Net Core - Version 2.2
 
 ## Limitations
 
