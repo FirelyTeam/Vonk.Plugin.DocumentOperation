@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.2.0 - 2019-07-14
+
+### Added
+- Custom resources can be included in a document. See http://docs.simplifier.net/vonk/features/customresources.html for more details about custom resources
+- An OperationOutcome is included in the response if local references can't be resolved
+
+### Changed
+- Refactor $document operation to use the [ElementModel](http://docs.simplifier.net/fhirnetapi/parsing/intro-to-elementmodel.html) of the C# FHIR API
+- Removed dependency on Vonk.Fhir.R3
+- Upgraded Vonk dependency to Vonk 2.0.1
+
+### Fixed
+- An UUID is added to each generated document as an identifier. See https://hl7.org/fhir/documents.html#content for more details about requirements concerning identifiers in documents.
+
 ## 1.1.0 - 2019-02-07
 
 ### Added

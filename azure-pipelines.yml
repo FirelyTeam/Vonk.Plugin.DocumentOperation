@@ -8,8 +8,12 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- script: |
-    dotnet build --configuration $(buildConfiguration)
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    command: build
+    projects: ' *.sln'
+    arguments: '--configuration $(BuildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: Test
@@ -18,12 +22,3 @@ steps:
     projects: |
      **/*.Test/*.csproj
     arguments: '--configuration $(BuildConfiguration)  --no-restore --no-build'
-
-- script: |
-    dotnet publish --configuration $(buildConfiguration) --output $BUILD_ARTIFACTSTAGINGDIRECTORY
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: plugin.dll' 
-  inputs:
-    PathtoPublish: '$(Build.StagingDirectory)/pub/plugin'
-    ArtifactName: DocumentOperation.dll
