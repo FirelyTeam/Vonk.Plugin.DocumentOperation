@@ -11,8 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Refactor $document operation to use the [ElementModel](http://docs.simplifier.net/fhirnetapi/parsing/intro-to-elementmodel.html) of the C# FHIR API
-- Removed dependancy on Vonk.Fhir.R3
-- Upgraded Vonk dependancy to Vonk 2.0.1
+- Removed dependency on Vonk.Fhir.R3
+- Upgraded Vonk dependency to Vonk 2.0.1
 
 ### Fixed
 - An UUID is added to each generated document as an identifier. See https://hl7.org/fhir/documents.html#content for more details about requirements concerning identifiers in documents.
