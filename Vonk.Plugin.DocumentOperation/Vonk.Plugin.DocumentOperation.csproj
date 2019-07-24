@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Vonk.Core" Version="2.1.0" />
-    <PackageReference Include="Vonk.Fhir.R3" Version="2.0.1" />
+    <PackageReference Include="Vonk.Fhir.R3" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
