@@ -55,9 +55,12 @@ namespace Vonk.Plugin.DocumentOperation
         public async Task DocumentTypePOST(IVonkContext context)
         {
             var (request, args, response) = context.Parts();
-            if (request.GetRequiredPayload(response, out var parameters))
+            if (request.GetRequiredPayload(response, out var payload))
             {
-                var compositionID = parameters.SelectNodes("parameter.name").FirstOrDefault(node => node.Text == "id")?.Text;
+                var parameters = payload.ToTypedElement(_schemaProvider);
+                var nameParameter = parameters.Select("children().where($this.name = 'id')").FirstOrDefault();
+
+                var compositionID = nameParameter?.ChildString("value");
                 if (string.IsNullOrEmpty(compositionID))
                 {
                     response.HttpResult = StatusCodes.Status400BadRequest;

@@ -77,8 +77,11 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
+            var compositionId = "test";
             var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
-            _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+            _searchMock.Setup(repo => repo.Search(
+                                      It.Is<IArgumentCollection>(args => args.GetArgument(ArgumentNames.resourceId).ArgumentValue == compositionId),
+                                      It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
             // Create VonkContext for $document (POST / Type level)
             var testContext = new VonkTestContext(VonkInteraction.instance_custom);
@@ -90,7 +93,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             testContext.TestRequest.Method = "POST";
 
             var parameters = new Parameters();
-            var idValue = new FhirString("example");
+            var idValue = new FhirUri(compositionId);
             var parameterComponent = new Parameters.ParameterComponent { Name = "id" };
             parameterComponent.Value = idValue;
             parameters.Parameter.Add(parameterComponent);
