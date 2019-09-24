@@ -1,0 +1,18 @@
+# Repo: FirelyTeam/Vonk.Plugin.DocumentOperation
+# File: build/azure-pipelines.yml
+name: $(SourceBranchName)-$(Date:yyyyMMdd)$(Rev:-r)
+
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: FirelyTeam/azure-pipeline-templates
+      endpoint: GitHub_Access 
+
+variables:
+  buildConfiguration: 'Release'
+
+jobs:
+- template: build.yml@templates  # Template reference
+  parameters:
+    vmImage: 'windows-2019'
