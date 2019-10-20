@@ -10,22 +10,37 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
-    <PackageReference Include="Moq" Version="4.13.0" />
+    <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
+    <PackageReference Include="Vonk.UnitTests.Framework" Version="3.0.0" />
+    <PackageReference Include="Vonk.UnitTests.Framework.R4" Version="3.0.0" />
+    <PackageReference Include="Vonk.Fhir.R4" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Vonk.Plugin.DocumentOperation\Vonk.Plugin.DocumentOperation.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TestData\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Resources\CustomBasic-StructureDefinition-R3.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="TestData\CustomBasic-StructureDefinition-R3.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+    <Target Name="AddPackageAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences" Outputs="%(PackageReference.Identity)">
+     <ItemGroup>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Core'">
+        <Aliases>stu3</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Specification'">
+        <Aliases>stu3spec</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.R4.Core'">
+        <Aliases>r4</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.R4.Specification'">
+        <Aliases>r4spec</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Serialization'">
+        <Aliases>ser</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.ElementModel'">
+        <Aliases>elem</Aliases>
+      </ReferencePath>
+    </ItemGroup>    
+  </Target>
+
 </Project>
