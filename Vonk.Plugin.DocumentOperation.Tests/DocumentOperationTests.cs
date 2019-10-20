@@ -1,21 +1,25 @@
+extern alias r4;
+extern alias r4spec;
+
 using FluentAssertions;
-using Hl7.Fhir.Model;
-using Hl7.Fhir.Specification;
+using r4::Hl7.Fhir.Model;
+using r4spec::Hl7.Fhir.Specification;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Xunit;
 using System.Collections.Generic;
 using System.Linq;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
-using Vonk.Core.Context.Features;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
-using Vonk.Core.Support;
-using Vonk.Fhir.R3;
-using Vonk.Test.Utils;
-using Xunit;
-using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
+using Vonk.Fhir.R4;
+using Vonk.UnitTests.Framework.R4;
+using Vonk.UnitTests.Framework.Helpers;
+using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
+using static Vonk.Fhir.R4.FhirExtensions;
+using static Vonk.Core.Common.IResourceExtensions;
 using Task = System.Threading.Tasks.Task;
 
 namespace Vonk.Plugin.DocumentOperation.Test
@@ -36,11 +40,10 @@ namespace Vonk.Plugin.DocumentOperation.Test
         private ILogger<DocumentService> _logger = Logger<DocumentService>();
         private Mock<ISearchRepository> _searchMock = new Mock<ISearchRepository>();
         private Mock<IResourceChangeRepository> _changeMock = new Mock<IResourceChangeRepository>();
-        private IStructureDefinitionSummaryProvider _schemaProvider = new PocoStructureDefinitionSummaryProvider();
 
         public DocumentOperationTests()
         {
-            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _schemaProvider, _logger);
+            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, SchemaProvidersR4.PocoProvider, _logger);
         }
 
         [Fact]
@@ -133,7 +136,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status400BadRequest, "$document should fail with HTTP 400 - Bad request if Parameters resource does not contain an id");
             testContext.Response.Outcome.Should().NotBeNull();
-            testContext.Response.Outcome.Issue.Should().Contain(issue => issue.Code.Equals(VonkIssues.INVALID_REQUEST.Type));
+            testContext.Response.Outcome.Issues.Should().Contain(issue => issue.Details.Equals(VonkIssue.INVALID_REQUEST));
         }
 
         [Fact]
@@ -213,7 +216,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
-            testContext.Response.Outcome.Issue.Count(issue => issue.Code == OperationOutcome.IssueType.NotFound).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
+            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
         [Fact]
@@ -247,7 +250,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
-            testContext.Response.Outcome.Issue.Count(issue => issue.Code == OperationOutcome.IssueType.NotFound).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
+            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
         [Fact]
@@ -285,7 +288,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
-            testContext.Response.Outcome.Issue.Count(issue => issue.Code == OperationOutcome.IssueType.NotFound).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
+            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
         [Fact]
@@ -350,7 +353,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when an external reference is referenced by the composition");
-            testContext.Response.Outcome.Issue.Count(issue => issue.Code == OperationOutcome.IssueType.NotSupported).Should().NotBe(0, "OperationOutcome should highlight that this feature is not supported");
+            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotSupported)).Should().NotBe(0, "OperationOutcome should highlight that this feature is not supported");
         }
 
         [Fact]
@@ -424,8 +427,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
         private IResource CreateTestList()
         {
-            var list = new Hl7.Fhir.Model.List { Id = "test" };
-            var entryComponent = new Hl7.Fhir.Model.List.EntryComponent();
+            var list = new r4::Hl7.Fhir.Model.List { Id = "test" };
+            var entryComponent = new r4::Hl7.Fhir.Model.List.EntryComponent();
             entryComponent.Item = new ResourceReference("MedicationStatement/test");
             list.Entry.Add(entryComponent);
 
