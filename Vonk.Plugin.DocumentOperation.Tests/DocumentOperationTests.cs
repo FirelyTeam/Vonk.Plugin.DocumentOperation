@@ -15,7 +15,7 @@ using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
 using Vonk.Fhir.R4;
-using Vonk.UnitTests.Framework.R4;
+using Vonk.UnitTests.Framework.R3;
 using Vonk.UnitTests.Framework.Helpers;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 using static Vonk.Fhir.R4.FhirExtensions;
@@ -43,7 +43,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
         public DocumentOperationTests()
         {
-            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, SchemaProvidersR4.PocoProvider, _logger);
+            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, SchemaProvidersR3.PocoProvider, _logger);
         }
 
         [Fact]

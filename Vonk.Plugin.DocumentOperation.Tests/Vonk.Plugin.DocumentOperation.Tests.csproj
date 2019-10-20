@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -13,14 +12,22 @@
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
     <PackageReference Include="Vonk.UnitTests.Framework" Version="3.0.0" />
-    <PackageReference Include="Vonk.UnitTests.Framework.R4" Version="3.0.0" />
-    <PackageReference Include="Vonk.Fhir.R4" Version="3.0.0" />
+    <PackageReference Include="Vonk.UnitTests.Framework.R3" Version="3.0.0" />
+    <PackageReference Include="Vonk.Fhir.R3" Version="3.0.0" />
+    <PackageReference Include="Hl7.Fhir.Specification.STU3" Version="1.4.0" GeneratePathProperty="true" ExcludeAssets="contentFiles" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Vonk.Plugin.DocumentOperation\Vonk.Plugin.DocumentOperation.csproj" />
   </ItemGroup>
-    <Target Name="AddPackageAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences" Outputs="%(PackageReference.Identity)">
+
+  <ItemGroup>
+    <None Update="TestData\CustomBasic-StructureDefinition-R3.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="AddPackageAliases" BeforeTargets="ResolveReferences" Outputs="%(PackageReference.Identity)">
      <ItemGroup>
       <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Core'">
         <Aliases>stu3</Aliases>
@@ -42,5 +49,13 @@
       </ReferencePath>
     </ItemGroup>    
   </Target>
+
+  <ItemGroup>
+    <Content Include="$(PkgHl7_Fhir_Specification_STU3)\contentFiles\any\any\specification.zip">
+      <Link>specification_Fhir3_0.zip</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>
