@@ -1,9 +1,9 @@
-extern alias r4;
-extern alias r4spec;
+extern alias stu3;
+extern alias stu3spec;
 
 using FluentAssertions;
-using r4::Hl7.Fhir.Model;
-using r4spec::Hl7.Fhir.Specification;
+using stu3::Hl7.Fhir.Model;
+using stu3spec::Hl7.Fhir.Specification;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -14,11 +14,10 @@ using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
-using Vonk.Fhir.R4;
+using Vonk.Fhir.R3;
 using Vonk.UnitTests.Framework.R3;
 using Vonk.UnitTests.Framework.Helpers;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
-using static Vonk.Fhir.R4.FhirExtensions;
 using static Vonk.Core.Common.IResourceExtensions;
 using Task = System.Threading.Tasks.Task;
 
@@ -427,8 +426,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
         private IResource CreateTestList()
         {
-            var list = new r4::Hl7.Fhir.Model.List { Id = "test" };
-            var entryComponent = new r4::Hl7.Fhir.Model.List.EntryComponent();
+            var list = new stu3::Hl7.Fhir.Model.List { Id = "test" };
+            var entryComponent = new stu3::Hl7.Fhir.Model.List.EntryComponent();
             entryComponent.Item = new ResourceReference("MedicationStatement/test");
             list.Entry.Add(entryComponent);
 
