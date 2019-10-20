@@ -87,28 +87,40 @@ namespace Vonk.Plugin.DocumentOperation
             var documentBundle = CreateEmptyBundle();
 
             // Get Composition resource
-            (var compositionResolved, var resolvedResource, var failedReference) = await ResolveResource(compositionID, "Composition");
+            (var compositionResolved, var resolvedResource, var error) = await ResolveResource(compositionID, "Composition");
             if (compositionResolved)
             {
+                if (resolvedResource.InformationModel != vonkContext.InformationModel)
+                {
+                    WrongInformationModel(vonkContext.InformationModel, resolvedResource);
+                    vonkContext.Response.HttpResult = StatusCodes.Status415UnsupportedMediaType;
+                    return;
+                }
+
                 // Include Composition resource in search results
                 documentBundle = documentBundle.AddEntry(resolvedResource, "Composition/" + compositionID);
 
                 // Recursively resolve and include all references in the search bundle, overwrite documentBundle as GenericBundle is immutable
-                (_, documentBundle, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
+                (_, documentBundle, error) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
             }
 
             // Handle responses
             vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
-            if (!(failedReference is null))
+            if (!(error is null))
             {
                 if (!compositionResolved) // Composition resource, on which the operation is called, does not exist
                 {
                     _logger.LogTrace("$document called on non-existing Composition/{id}", compositionID);
                     CancelDocumentOperation(vonkContext, StatusCodes.Status404NotFound);
                 }
+                else if (error.Equals(VonkIssue.PROCESSING_ERROR))
+                {
+                    _logger.LogTrace("$document failed to include resource in correct information model", compositionID);
+                    CancelDocumentOperation(vonkContext, StatusCodes.Status415UnsupportedMediaType, error);
+                }
                 else // Local or external reference reference could not be found
                 {
-                    CancelDocumentOperation(vonkContext, StatusCodes.Status500InternalServerError, failedReference);
+                    CancelDocumentOperation(vonkContext, StatusCodes.Status500InternalServerError, error);
                 }
                 return;
             }
@@ -135,7 +147,7 @@ namespace Vonk.Plugin.DocumentOperation
         /// - success describes if all references could recursively be found, starting from the given resource
         /// - failedReference contains the first reference that could not be resolved, empty if all resources can be resolved
         /// </returns>
-        private async Task<(bool success, GenericBundle documentBundle, VonkIssue failedReference)> IncludeReferencesInBundle(IResource startResource, GenericBundle searchBundle)
+        private async Task<(bool success, GenericBundle documentBundle, VonkIssue error)> IncludeReferencesInBundle(IResource startResource, GenericBundle searchBundle)
         {
             var includedReferences = new HashSet<string>();
             return await IncludeReferencesInBundle(startResource, searchBundle, includedReferences);
@@ -148,7 +160,7 @@ namespace Vonk.Plugin.DocumentOperation
         /// <param name="documentBundle"></param>
         /// <param name="includedReferences">Remember which resources were already added to the search bundle</param>
         /// <returns></returns>
-        private async Task<(bool success, GenericBundle documentBundle, VonkIssue failedReference)> IncludeReferencesInBundle(IResource resource, GenericBundle documentBundle, HashSet<string> includedReferences)
+        private async Task<(bool success, GenericBundle documentBundle, VonkIssue error)> IncludeReferencesInBundle(IResource resource, GenericBundle documentBundle, HashSet<string> includedReferences)
         {
             // Get references of given resource
             var allReferencesInResourceQuery = "$this.descendants().where($this is Reference).reference";
@@ -158,14 +170,20 @@ namespace Vonk.Plugin.DocumentOperation
             // Skip the following resources: 
             //    - Contained resources as they are already included through their parents
             //    - Resources that are already included in the search bundle
-            (bool successfulResolve, IResource resolvedResource, VonkIssue failedReference) = (true, null, null);
+            (bool successfulResolve, IResource resolvedResource, VonkIssue error) = (true, null, null);
             foreach (var reference in references)
             {
                 var referenceValue = reference.Value.ToString();
                 if (!referenceValue.StartsWith("#", StringComparison.Ordinal) && !includedReferences.Contains(referenceValue))
                 {
-                    (successfulResolve, resolvedResource, failedReference) = await ResolveResource(referenceValue);
+                    (successfulResolve, resolvedResource, error) = await ResolveResource(referenceValue);
                     if(successfulResolve){
+
+                        if(resource.InformationModel != resolvedResource.InformationModel)
+                        {
+                            return (false, documentBundle, WrongInformationModel(resource.InformationModel, resolvedResource));
+                        }
+                           
                         documentBundle = documentBundle.AddEntry(resolvedResource, referenceValue);
                         includedReferences.Add(referenceValue);
                     }
@@ -174,13 +192,13 @@ namespace Vonk.Plugin.DocumentOperation
                     }
 
                     // Recursively resolve all references in the included resource
-                    (successfulResolve, documentBundle, failedReference) = await IncludeReferencesInBundle(resolvedResource, documentBundle, includedReferences);
+                    (successfulResolve, documentBundle, error) = await IncludeReferencesInBundle(resolvedResource, documentBundle, includedReferences);
                     if(!successfulResolve){
                         break;
                     }
                 }
             }
-            return (successfulResolve, documentBundle, failedReference);
+            return (successfulResolve, documentBundle, error);
         }
 
         #region Helper - Bundle-related
@@ -254,7 +272,6 @@ namespace Vonk.Plugin.DocumentOperation
 
         private VonkIssue ReferenceNotResolvedIssue(string failedReference, bool missingReferenceIsLocal)
         {
-
             if (missingReferenceIsLocal)
             {
                 return new VonkIssue(IssueSeverity.Error, IssueType.NotFound, "MSG_LOCAL_FAIL", $"Unable to resolve local reference to resource {failedReference}");
@@ -264,6 +281,11 @@ namespace Vonk.Plugin.DocumentOperation
                 return new VonkIssue(IssueSeverity.Error, IssueType.NotSupported, "MSG_EXTERNAL_FAIL", $"Resolving external resource references ({failedReference}) is not supported");
             }
 
+        }
+
+        private VonkIssue WrongInformationModel(string expectedInformationModel, IResource resolvedResource)
+        {
+            return new VonkIssue(VonkIssue.PROCESSING_ERROR.Severity, VonkIssue.PROCESSING_ERROR.IssueType, details: $"Found {resolvedResource.Type}/{resolvedResource.Version} in information model {resolvedResource.InformationModel}. Expected information model {expectedInformationModel} instead.");
         }
 
     }
