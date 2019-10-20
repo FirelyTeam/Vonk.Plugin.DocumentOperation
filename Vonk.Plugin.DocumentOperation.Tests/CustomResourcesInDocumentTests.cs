@@ -50,7 +50,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             var customResourceTest = SourceNode.Resource("CustomBasic", "CustomBasic");
             customResourceTest.Add(SourceNode.Valued("id", Guid.NewGuid().ToString()));
-            var customResourceSearchResults = new SearchResult(new List<IResource> { customResourceTest.ToIResource(VonkConstants.Model.FhirR4) }, 1, 1);
+            var customResourceSearchResults = new SearchResult(new List<IResource> { customResourceTest.ToIResource(VonkConstants.Model.FhirR3) }, 1, 1);
 
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("CustomBasic")), It.IsAny<SearchOptions>())).ReturnsAsync(customResourceSearchResults);
