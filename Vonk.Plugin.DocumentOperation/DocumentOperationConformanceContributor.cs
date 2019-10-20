@@ -1,12 +1,16 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
-using Vonk.Core.Context;
-using Vonk.Core.Pluggability;
+using Vonk.Core.Common;
+using Vonk.Core.Context.Guards;
+using Vonk.Core.Metadata;
+using Vonk.Core.Model.Capability;
+using Vonk.Core.Pluggability.ContextAware;
 using Vonk.Core.Support;
 
 namespace Vonk.Plugin.DocumentOperation
 {
-    public class DocumentOperationConformanceContributor : IConformanceContributor
+    [ContextAware(InformationModels = new[] { VonkConstants.Model.FhirR3, VonkConstants.Model.FhirR4 })]
+    internal class DocumentOperationConformanceContributor : ICapabilityStatementContributor
     {
         private const string _operationName = "document";
         private readonly SupportedInteractionOptions _supportedInteractionOptions;
@@ -17,7 +21,7 @@ namespace Vonk.Plugin.DocumentOperation
             _supportedInteractionOptions = optionAccessor.Value;
         }
 
-        public void Conformance(IConformanceBuilder builder)
+        public void ContributeToCapabilityStatement(ICapabilityStatementBuilder builder)
         {
             Check.NotNull(builder, nameof(builder));
             if (_supportedInteractionOptions.SupportsCustomOperation(_operationName))
