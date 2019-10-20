@@ -19,10 +19,10 @@ using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
 using Vonk.Test.Utils;
+using Vonk.Fhir.R3;
 using Vonk.UnitTests.Framework.Helpers;
 using static Vonk.UnitTests.Framework.R3.SchemaProvidersR3;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
-using static Vonk.Fhir.R3.FhirExtensions;
 using Task = System.Threading.Tasks.Task;
 
 namespace Vonk.Plugin.DocumentOperation.Test
