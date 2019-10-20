@@ -71,7 +71,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should succeed with HTTP 200 - OK on test composition");
             testContext.Response.Payload.Should().NotBeNull();
             var bundleType = testContext.Response.Payload.SelectText("type");
-            bundleType.Should().Be("document");
+            bundleType.Should().Be("document", "Bundle.type should be set to 'document'");
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should succeed with HTTP 200 - OK on test composition");
             testContext.Response.Payload.Should().NotBeNull();
             var bundleType = testContext.Response.Payload.SelectText("type");
-            bundleType.Should().Be("document");
+            bundleType.Should().Be("document", "Bundle.type should be set to 'document'");
         }
 
         [Fact]
@@ -135,8 +135,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status400BadRequest, "$document should fail with HTTP 400 - Bad request if Parameters resource does not contain an id");
-            testContext.Response.Outcome.Should().NotBeNull();
-            testContext.Response.Outcome.Issues.Should().Contain(issue => issue.Details.Equals(VonkIssue.INVALID_REQUEST));
+            testContext.Response.Outcome.Should().NotBeNull("At least one OperationOutcome should be returned");
+            testContext.Response.Outcome.Issues.Count(issue => issue.IssueType.Equals(VonkOutcome.IssueType.Invalid)).Should().NotBe(0, "Request should be rejected as an invalid");
         }
 
         [Fact]
@@ -216,7 +216,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
-            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
+            testContext.Response.Outcome.Issues.Count(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
         [Fact]
@@ -250,7 +250,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
-            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
+            testContext.Response.Outcome.Issues.Count(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
         [Fact]
@@ -288,7 +288,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
-            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
+            testContext.Response.Outcome.Issues.Count(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound)).Should().NotBe(0, "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
         [Fact]
@@ -353,7 +353,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when an external reference is referenced by the composition");
-            testContext.Response.Outcome.Issues.Count(issue => issue.Details.Equals(VonkOutcome.IssueType.NotSupported)).Should().NotBe(0, "OperationOutcome should highlight that this feature is not supported");
+            testContext.Response.Outcome.Issues.Count(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotSupported)).Should().NotBe(0, "OperationOutcome should highlight that this feature is not supported");
         }
 
         [Fact]
