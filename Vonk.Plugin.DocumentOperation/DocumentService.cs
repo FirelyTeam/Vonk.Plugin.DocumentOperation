@@ -86,14 +86,15 @@ namespace Vonk.Plugin.DocumentOperation
             // Build empty document bundle
             var documentBundle = CreateEmptyBundle();
 
+            vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
+
             // Get Composition resource
             (var compositionResolved, var resolvedResource, var error) = await ResolveResource(compositionID, "Composition");
             if (compositionResolved)
             {
                 if (resolvedResource.InformationModel != vonkContext.InformationModel)
                 {
-                    WrongInformationModel(vonkContext.InformationModel, resolvedResource);
-                    vonkContext.Response.HttpResult = StatusCodes.Status415UnsupportedMediaType;
+                    CancelDocumentOperation(vonkContext, StatusCodes.Status415UnsupportedMediaType, WrongInformationModel(vonkContext.InformationModel, resolvedResource));
                     return;
                 }
 
@@ -105,7 +106,6 @@ namespace Vonk.Plugin.DocumentOperation
             }
 
             // Handle responses
-            vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
             if (!(error is null))
             {
                 if (!compositionResolved) // Composition resource, on which the operation is called, does not exist
