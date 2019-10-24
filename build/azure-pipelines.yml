@@ -15,4 +15,5 @@ variables:
 jobs:
 - template: build.yml@templates  # Template reference
   parameters:
-    vmImage: 'windows-2019'
+    pool:
+      vmImage: windows-latest
