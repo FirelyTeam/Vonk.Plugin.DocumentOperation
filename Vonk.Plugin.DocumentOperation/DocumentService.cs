@@ -285,7 +285,7 @@ namespace Vonk.Plugin.DocumentOperation
 
         private VonkIssue WrongInformationModel(string expectedInformationModel, IResource resolvedResource)
         {
-            return new VonkIssue(VonkIssue.PROCESSING_ERROR.Severity, VonkIssue.PROCESSING_ERROR.IssueType, details: $"Found {resolvedResource.Type}/{resolvedResource.Version} in information model {resolvedResource.InformationModel}. Expected information model {expectedInformationModel} instead.");
+            return new VonkIssue(VonkIssue.PROCESSING_ERROR.Severity, VonkIssue.PROCESSING_ERROR.IssueType, details: $"Found {resolvedResource.Type}/{resolvedResource.Id} in information model {resolvedResource.InformationModel}. Expected information model {expectedInformationModel} instead.");
         }
 
     }
