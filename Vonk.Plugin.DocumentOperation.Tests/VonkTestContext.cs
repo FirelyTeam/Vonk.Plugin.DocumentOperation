@@ -1,9 +1,7 @@
-﻿using Hl7.Fhir.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
-using Vonk.Core.Context.Features;
 
 namespace Vonk.Test.Utils
 {
@@ -16,21 +14,21 @@ namespace Vonk.Test.Utils
             TestResponse = new VonkTestResponse();
         }
 
-        public VonkTestContext(VonkInteraction interaction): this()
+        public VonkTestContext(VonkInteraction interaction) : this()
         {
             TestRequest.Interaction = interaction;
         }
 
-        public VonkTestRequest TestRequest { get { return _vonkRequest as VonkTestRequest; } set { _vonkRequest = value; } } 
+        public VonkTestRequest TestRequest { get { return _vonkRequest as VonkTestRequest; } set { _vonkRequest = value; } }
         public VonkTestResponse TestResponse { get { return _vonkResponse as VonkTestResponse; } set { _vonkResponse = value; } }
-        public IArgumentCollection TestArguments { get { return _vonkArguments.Arguments; } set { _vonkArguments = new VonkTestArguments(value); } } 
+        public IArgumentCollection TestArguments { get { return _vonkArguments.Arguments; } set { _vonkArguments = new VonkTestArguments(value); } }
         public Uri TestServerBase { get { return base.ServerBase; } set { base._serverBase = value; } }
     }
 
     public class VonkTestRequest : IVonkRequest
     {
         public string Path { get; set; }
-        public string Method{ get; set; }
+        public string Method { get; set; }
         public string CustomOperation { get; set; }
 
         public VonkInteraction Interaction { get; set; }
@@ -54,7 +52,7 @@ namespace Vonk.Test.Utils
         public Dictionary<VonkResultHeader, string> Headers { get; set; } = new Dictionary<VonkResultHeader, string>();
 
         public int HttpResult { get; set; }
-        public OperationOutcome Outcome { get; set; } = new OperationOutcome();
+        public VonkOutcome Outcome { get; set; } = new VonkOutcome();
         public IResource Payload { get; set; }
     }
 }

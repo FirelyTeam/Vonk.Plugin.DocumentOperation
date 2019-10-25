@@ -8,9 +8,9 @@ using Hl7.Fhir.Specification.Snapshot;
 using Hl7.Fhir.Specification.Source;
 using Microsoft.AspNetCore.Hosting;
 using Moq;
-using Vonk.Core.Context;
-using Vonk.Core.Operations.Validation;
+using Vonk.Core.Common;
 using Vonk.Core.Support;
+using Vonk.Fhir.R3.Common;
 using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
 
 namespace Vonk.Test.Utils
@@ -56,7 +56,7 @@ namespace Vonk.Test.Utils
                 var hostingEnv = new Mock<IHostingEnvironment>();
                 hostingEnv.Setup(he => he.ContentRootPath).Returns(Directory.GetCurrentDirectory());
                 var zipLocator = new SpecificationZipLocator(hostingEnv.Object, Logger<SpecificationZipLocator>());
-                _coreResolver = new SpecificationZipResolver(zipLocator);
+                _coreResolver = new SpecificationZipResolverR3(zipLocator, Logger<SpecificationZipResolverR3>());
 
                 _customSds = customSds;
                 foreach (var item in _customSds)

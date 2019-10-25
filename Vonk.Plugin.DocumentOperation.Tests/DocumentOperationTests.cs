@@ -1,24 +1,21 @@
-extern alias stu3;
-extern alias stu3spec;
-
 using FluentAssertions;
-using stu3::Hl7.Fhir.Model;
-using stu3spec::Hl7.Fhir.Specification;
+using Hl7.Fhir.Model;
+using Hl7.Fhir.Specification;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 using System.Collections.Generic;
 using System.Linq;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
+using Vonk.Core.Context.Features;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
+using Vonk.Core.Support;
 using Vonk.Fhir.R3;
-using Vonk.UnitTests.Framework.R3;
-using Vonk.UnitTests.Framework.Helpers;
-using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
-using static Vonk.Core.Common.IResourceExtensions;
+using Vonk.Test.Utils;
+using Xunit;
+using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
 
 namespace Vonk.Plugin.DocumentOperation.Test
@@ -39,10 +36,11 @@ namespace Vonk.Plugin.DocumentOperation.Test
         private ILogger<DocumentService> _logger = Logger<DocumentService>();
         private Mock<ISearchRepository> _searchMock = new Mock<ISearchRepository>();
         private Mock<IResourceChangeRepository> _changeMock = new Mock<IResourceChangeRepository>();
+        private IStructureDefinitionSummaryProvider _schemaProvider = new PocoStructureDefinitionSummaryProvider();
 
         public DocumentOperationTests()
         {
-            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, SchemaProvidersR3.PocoProvider, _logger);
+            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _schemaProvider, _logger);
         }
 
         [Fact]
@@ -426,8 +424,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
         private IResource CreateTestList()
         {
-            var list = new stu3::Hl7.Fhir.Model.List { Id = "test" };
-            var entryComponent = new stu3::Hl7.Fhir.Model.List.EntryComponent();
+            var list = new List { Id = "test" };
+            var entryComponent = new List.EntryComponent();
             entryComponent.Item = new ResourceReference("MedicationStatement/test");
             list.Entry.Add(entryComponent);
 

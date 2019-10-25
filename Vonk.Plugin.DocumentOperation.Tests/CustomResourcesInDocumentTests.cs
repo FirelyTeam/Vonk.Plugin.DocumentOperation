@@ -1,28 +1,22 @@
-﻿extern alias elem;
-extern alias stu3spec;
-extern alias stu3;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using elem::Hl7.Fhir.ElementModel;
-using stu3::Hl7.Fhir.Model;
-using stu3::Hl7.Fhir.Serialization;
-using stu3spec::Hl7.Fhir.Specification;
+using Hl7.Fhir.ElementModel;
+using Hl7.Fhir.Model;
+using Hl7.Fhir.Serialization;
+using Hl7.Fhir.Specification;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Xunit;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
-using Vonk.Test.Utils;
 using Vonk.Fhir.R3;
-using Vonk.UnitTests.Framework.Helpers;
-using static Vonk.UnitTests.Framework.R3.SchemaProvidersR3;
-using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
+using Vonk.Test.Utils;
+using Xunit;
+using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
 
 namespace Vonk.Plugin.DocumentOperation.Test
@@ -33,13 +27,15 @@ namespace Vonk.Plugin.DocumentOperation.Test
         private readonly ILogger<DocumentService> _logger = Logger<DocumentService>();
         private readonly Mock<ISearchRepository> _searchMock = new Mock<ISearchRepository>();
         private readonly Mock<IResourceChangeRepository> _changeMock = new Mock<IResourceChangeRepository>();
+        private readonly IStructureDefinitionSummaryProvider _schemaProvider;
 
         public CustomResourcesInDocumentTests()
         {
             var customBasicStructureDefinitionJson = TestResourceReader.ReadTestData("CustomBasic-StructureDefinition-R3.json");
             var customBasicStructureDefinition = new FhirJsonParser().Parse<StructureDefinition>(customBasicStructureDefinitionJson);
 
-            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, CreateCustomSchemaProvider(customBasicStructureDefinition), _logger);
+            _schemaProvider = SchemaProviders.CreateCustomSchemaProvider(customBasicStructureDefinition);
+            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _schemaProvider, _logger);
         }
 
         [Fact]
@@ -50,6 +46,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             var customResourceTest = SourceNode.Resource("CustomBasic", "CustomBasic");
             customResourceTest.Add(SourceNode.Valued("id", Guid.NewGuid().ToString()));
+
             var customResourceSearchResults = new SearchResult(new List<IResource> { customResourceTest.ToIResource(VonkConstants.Model.FhirR3) }, 1, 1);
 
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
