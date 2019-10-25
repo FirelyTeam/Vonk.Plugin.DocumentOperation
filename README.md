@@ -1,6 +1,6 @@
 |Develop|Master|
 |---|---|
-|[![Build Status Develop](https://firely.visualstudio.com/vonk%20public%20plugins/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=develop)](https://firely.visualstudio.com/vonk%20public%20plugins/_build/latest?definitionId=33&branchName=develop)| [![Build Status Master](https://firely.visualstudio.com/vonk%20public%20plugins/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=master)](https://firely.visualstudio.com/vonk%20public%20plugins/_build/latest?definitionId=33&branchName=master)|
+|[![Build Status Develop](https://firely.visualstudio.com/vonk%20public%20plugins/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=develop)](https://firely.visualstudio.com/vonk%20public%20plugins/_build/latest?definitionId=34&branchName=develop)| [![Build Status Master](https://firely.visualstudio.com/vonk%20public%20plugins/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=master)](https://firely.visualstudio.com/vonk%20public%20plugins/_build/latest?definitionId=34&branchName=master)|
 
 # $document operation for Vonk FHIR server
 
