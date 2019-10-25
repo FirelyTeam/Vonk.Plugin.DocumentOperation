@@ -8,14 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
-using Vonk.Core.Context.Features;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
-using Vonk.Core.Support;
 using Vonk.Fhir.R3;
-using Vonk.Test.Utils;
+using Vonk.UnitTests.Framework.Helpers;
 using Xunit;
-using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
+using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
 
 namespace Vonk.Plugin.DocumentOperation.Test

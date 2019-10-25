@@ -11,11 +11,10 @@ using Moq;
 using Vonk.Core.Common;
 using Vonk.Core.Support;
 using Vonk.Fhir.R3.Common;
-using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
+using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 
 namespace Vonk.Test.Utils
 {
-
     public class SchemaProviders
     {
         public static IStructureDefinitionSummaryProvider CreateCustomSchemaProvider(params StructureDefinition[] customSds)
