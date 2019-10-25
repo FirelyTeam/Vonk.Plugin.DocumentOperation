@@ -51,7 +51,7 @@ namespace Vonk.Plugin.DocumentOperation
         [InteractionHandler(VonkInteraction.type_custom, CustomOperation = "document", Method = "POST", AcceptedTypes = new string[] { "Composition" })]
         public async Task DocumentTypePOST(IVonkContext context)
         {
-            var (request, args, response) = context.Parts();
+            var (request, _, response) = context.Parts();
             if (request.GetRequiredPayload(response, out var payload))
             {
                 var parameters = payload.ToTypedElement(_schemaProvider);
@@ -272,15 +272,18 @@ namespace Vonk.Plugin.DocumentOperation
 
         private VonkIssue ReferenceNotResolvedIssue(string failedReference, bool missingReferenceIsLocal)
         {
+            VonkIssue issue;
             if (missingReferenceIsLocal)
             {
-                return new VonkIssue(IssueSeverity.Error, IssueType.NotFound, "MSG_LOCAL_FAIL", $"Unable to resolve local reference to resource {failedReference}");
+                issue = new VonkIssue(IssueSeverity.Error, IssueType.NotFound, "MSG_LOCAL_FAIL", $"Unable to resolve local reference to resource {failedReference}");
             }
             else
             {
-                return new VonkIssue(IssueSeverity.Error, IssueType.NotSupported, "MSG_EXTERNAL_FAIL", $"Resolving external resource references ({failedReference}) is not supported");
+                issue = new VonkIssue(IssueSeverity.Error, IssueType.NotSupported, "MSG_EXTERNAL_FAIL", $"Resolving external resource references ({failedReference}) is not supported");
             }
 
+            issue.DetailCodeSystem = "http://vonk.fire.ly/fhir/ValueSet/OperationOutcomeIssueDetails";
+            return issue;
         }
 
         private VonkIssue WrongInformationModel(string expectedInformationModel, IResource resolvedResource)
