@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.3.0 - 2019-10-25
+
+### Changed
+- Upgraded Vonk dependency to Vonk 2.1.0
+
+### Fixed
+- Fixed an issue where an incorrect value would be selected from a Parameter resource as the Composition id
+
 ## 1.2.0 - 2019-07-14
 
 ### Added
