@@ -48,7 +48,7 @@ To test the operation:
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/2c5da2fa4dd4cb83dddf)
 
-The Postman collection for all the requests mentioned above can also be found in the 'data' folder.
+A Postman collection for all the requests mentioned above can also be found in the 'data' folder.
 
 ## License
 
