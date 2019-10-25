@@ -11,8 +11,6 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="FluentAssertions" Version="5.9.0" />
-    <PackageReference Include="Vonk.UnitTests.Framework" Version="3.0.0" />
-    <PackageReference Include="Vonk.UnitTests.Framework.R3" Version="3.0.0" />
     <PackageReference Include="Vonk.Fhir.R3" Version="3.0.0" />
     <PackageReference Include="Hl7.Fhir.Specification.STU3" Version="1.4.0" GeneratePathProperty="true" ExcludeAssets="contentFiles" />
   </ItemGroup>
@@ -22,40 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="TestData\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="TestData\CustomBasic-StructureDefinition-R3.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <Target Name="AddPackageAliases" BeforeTargets="ResolveReferences" Outputs="%(PackageReference.Identity)">
-     <ItemGroup>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Core'">
-        <Aliases>stu3</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Specification'">
-        <Aliases>stu3spec</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.R4.Core'">
-        <Aliases>r4</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.R4.Specification'">
-        <Aliases>r4spec</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Serialization'">
-        <Aliases>ser</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.ElementModel'">
-        <Aliases>elem</Aliases>
-      </ReferencePath>
-    </ItemGroup>    
-  </Target>
-
-  <ItemGroup>
-    <Content Include="$(PkgHl7_Fhir_Specification_STU3)\contentFiles\any\any\specification.zip">
-      <Link>specification_Fhir3_0.zip</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 
 </Project>
