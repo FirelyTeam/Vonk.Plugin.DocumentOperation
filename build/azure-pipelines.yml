@@ -17,3 +17,10 @@ jobs:
   parameters:
     pool:
       vmImage: windows-latest
+      
+- template: publish-plugin.yml@templates  # Template reference
+  parameters:
+    pool:
+      vmImage: windows-latest
+    packageName: vonk.plugin.documentoperation
+    packageDescription: 'Vonk Plugin implementing FHIR `$document`  operation'
