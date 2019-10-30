@@ -283,7 +283,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
-            testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound, "OperationOutcome should explicitly mention that the reference could not be found");
+            testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound), "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
         [Fact]
