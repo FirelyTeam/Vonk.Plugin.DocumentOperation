@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Vonk.Core.Metadata;
 using Vonk.Core.Pluggability;
-using Vonk.Core.Support;
+using Vonk.Core.Pluggability.ContextAware;
 
 namespace Vonk.Plugin.DocumentOperation
 {
@@ -14,8 +15,7 @@ namespace Vonk.Plugin.DocumentOperation
         public static IServiceCollection ConfigureServices(IServiceCollection services)
         {
             services.TryAddScoped<DocumentService>(); // $document implementation
-            services.AddIfNotExists<IConformanceContributor, DocumentOperationConformanceContributor>(ServiceLifetime.Transient);
-            services.TryAddTransient<DocumentOperationConformanceContributor>(); // Add operation to Vonk's CapabilityStatement
+            services.TryAddContextAware<ICapabilityStatementContributor, DocumentOperationConformanceContributor>(ServiceLifetime.Transient);  // Add operation to Vonk's CapabilityStatement
             return services;
         }
 
