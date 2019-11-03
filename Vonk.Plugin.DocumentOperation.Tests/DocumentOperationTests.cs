@@ -131,7 +131,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             // Check response status
             testContext.Response.HttpResult.Should().Be(StatusCodes.Status400BadRequest, "$document should fail with HTTP 400 - Bad request if Parameters resource does not contain an id");
             testContext.Response.Outcome.Should().NotBeNull("At least one OperationOutcome should be returned");
-            testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.Invalid), "Request should be rejected as an invalid");
+            testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.Invalid), "Request should be rejected as an invalid request");
         }
 
         [Fact]
