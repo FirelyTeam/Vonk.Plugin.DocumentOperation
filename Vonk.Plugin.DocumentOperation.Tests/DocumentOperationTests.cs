@@ -407,11 +407,6 @@ namespace Vonk.Plugin.DocumentOperation.Test
             return composition.ToIResource();
         }
 
-        private IResource CreateTestCompositionInclCustomResource()
-        {
-            return new Composition() { Id = "test", VersionId = "v1", Subject = new ResourceReference("CustomResourceTest/test") }.ToIResource();
-        }
-
         private IResource CreateTestPatient()
         {
             var patient = new Patient { Id = "test" };
