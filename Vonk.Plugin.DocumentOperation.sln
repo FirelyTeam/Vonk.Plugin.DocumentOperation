@@ -7,6 +7,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C367A354-F5E0-474F-8E7B-9E541D716CB6}"
 	ProjectSection(SolutionItems) = preProject
 		build\azure-pipelines.yml = build\azure-pipelines.yml
+		build\azure-release-pipeline.yml = build\azure-release-pipeline.yml
+		Vonk.Plugin.DocumentOperation.props = Vonk.Plugin.DocumentOperation.props
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vonk.Plugin.DocumentOperation.Tests", "Vonk.Plugin.DocumentOperation.Tests\Vonk.Plugin.DocumentOperation.Tests.csproj", "{F129CB6E-696F-4733-B379-CAA550E65EED}"

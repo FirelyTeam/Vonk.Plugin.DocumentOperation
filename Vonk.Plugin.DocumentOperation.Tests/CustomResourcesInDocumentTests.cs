@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -15,8 +15,9 @@ using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
 using Vonk.Fhir.R3;
 using Vonk.Test.Utils;
+using Vonk.UnitTests.Framework.Helpers;
 using Xunit;
-using static Vonk.Plugin.DocumentOperation.Test.LoggerUtils;
+using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
 
 namespace Vonk.Plugin.DocumentOperation.Test
@@ -46,7 +47,8 @@ namespace Vonk.Plugin.DocumentOperation.Test
 
             var customResourceTest = SourceNode.Resource("CustomBasic", "CustomBasic");
             customResourceTest.Add(SourceNode.Valued("id", Guid.NewGuid().ToString()));
-            var customResourceSearchResults = new SearchResult(new List<IResource> { customResourceTest.ToIResource() }, 1, 1);
+
+            var customResourceSearchResults = new SearchResult(new List<IResource> { customResourceTest.ToIResource(VonkConstants.Model.FhirR3) }, 1, 1);
 
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("CustomBasic")), It.IsAny<SearchOptions>())).ReturnsAsync(customResourceSearchResults);
