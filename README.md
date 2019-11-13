@@ -1,3 +1,7 @@
+|Develop|Master|
+|---|---|
+|[![Build Status Develop](https://firely.visualstudio.com/vonk%20public%20plugins/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=develop)](https://firely.visualstudio.com/vonk%20public%20plugins/_build/latest?definitionId=34&branchName=develop)| [![Build Status Master](https://firely.visualstudio.com/vonk%20public%20plugins/_apis/build/status/FirelyTeam.Vonk.Plugin.DocumentOperation?branchName=master)](https://firely.visualstudio.com/vonk%20public%20plugins/_build/latest?definitionId=34&branchName=master)|
+
 # $document operation for Vonk FHIR server
 
 This repository implements a plug-in for the Vonk FHIR server [(vonk.fire.ly)](vonk.fire.ly).<br>
@@ -14,10 +18,10 @@ For instructon on how to run the plug-in and the Vonk server, please see the off
 
 ### Build dependencies
 The following configuration has been succesfully tested for building and running the project:
-* Vonk FHIR server - Version 1.1.0
-* Visual Studio for Mac - Version 7.7.*
-* Visual Studio for Windows - Version 15.*.*
-* .Net Core - Version 2.0
+* Vonk FHIR server - Version 2.1.0
+* Visual Studio for Mac - Version 8.x.x
+* Visual Studio for Windows - Version 16.x.x
+* .Net Core - Version 2.2
 
 ## Limitations
 
@@ -42,7 +46,9 @@ To test the operation:
 - Inspect the result for the id that the Composition resource got.
 - Generate a document with ``GET [base]/Composition/[id]/$document``
 
-A Postman collection for all these requests can be found in the 'data' folder.
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/2c5da2fa4dd4cb83dddf)
+
+A Postman collection for all the requests mentioned above can also be found in the 'data' folder.
 
 ## License
 
