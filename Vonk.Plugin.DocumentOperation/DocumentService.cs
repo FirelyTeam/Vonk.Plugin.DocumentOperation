@@ -27,9 +27,9 @@ namespace Vonk.Plugin.DocumentOperation
         private readonly IStructureDefinitionSummaryProvider _schemaProvider;
         private readonly ILogger<DocumentService> _logger;
 
-        public DocumentService(ISearchRepository searchRepository, 
-            IResourceChangeRepository changeRepository, 
-            IStructureDefinitionSummaryProvider schemaProvider, 
+        public DocumentService(ISearchRepository searchRepository,
+            IResourceChangeRepository changeRepository,
+            IStructureDefinitionSummaryProvider schemaProvider,
             ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
@@ -199,7 +199,7 @@ namespace Vonk.Plugin.DocumentOperation
             bundleResourceNode.Add(identifier);
 
             var documentBundle = GenericBundle.FromBundle(bundleResourceNode);
-            documentBundle.Meta(Guid.NewGuid().ToString(), DateTimeOffset.Now);
+            documentBundle = documentBundle.Meta(Guid.NewGuid().ToString(), DateTimeOffset.Now);
 
             return documentBundle;
         }
