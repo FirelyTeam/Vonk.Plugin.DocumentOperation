@@ -5,7 +5,7 @@
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <OutputType>Library</OutputType>
     <Version>1.1.0</Version>
-    <Authors>Firely - Alexander Zautke, Christiaan Knapp, Marco Visser</Authors>
+    <Authors>Firely - Alexander Zautke, Christiaan Knaap, Marco Visser</Authors>
     <Company>Firely</Company>
   </PropertyGroup>
 
@@ -18,3 +18,4 @@
     <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
 </Project>
+

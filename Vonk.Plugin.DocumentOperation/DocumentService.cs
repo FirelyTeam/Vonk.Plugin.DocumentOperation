@@ -27,7 +27,10 @@ namespace Vonk.Plugin.DocumentOperation
         private readonly IStructureDefinitionSummaryProvider _schemaProvider;
         private readonly ILogger<DocumentService> _logger;
 
-        public DocumentService(ISearchRepository searchRepository, IResourceChangeRepository changeRepository, IStructureDefinitionSummaryProvider schemaProvider, ILogger<DocumentService> logger)
+        public DocumentService(ISearchRepository searchRepository, 
+            IResourceChangeRepository changeRepository, 
+            IStructureDefinitionSummaryProvider schemaProvider, 
+            ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
             Check.NotNull(changeRepository, nameof(changeRepository));

@@ -14,8 +14,9 @@ namespace Vonk.Plugin.DocumentOperation
         public static IServiceCollection ConfigureServices(IServiceCollection services)
         {
             services.TryAddScoped<DocumentService>(); // $document implementation
-            services.AddIfNotExists<IConformanceContributor, DocumentOperationConformanceContributor>(ServiceLifetime.Transient);
-            services.TryAddTransient<DocumentOperationConformanceContributor>(); // Add operation to Vonk's CapabilityStatement
+            services.AddIfNotExists
+                <IConformanceContributor, DocumentOperationConformanceContributor>
+                (ServiceLifetime.Transient);
             return services;
         }
 
@@ -27,13 +28,15 @@ namespace Vonk.Plugin.DocumentOperation
                 .OnCustomInteraction(VonkInteraction.instance_custom, "document")
                 .AndResourceTypes(new[] { "Composition" })
                 .AndMethod("GET")
-                .HandleAsyncWith<DocumentService>((svc, context) => svc.DocumentInstanceGET(context));
+                .HandleAsyncWith<DocumentService>((svc, context)
+                    => svc.DocumentInstanceGET(context));
 
             builder
                 .OnCustomInteraction(VonkInteraction.type_custom, "document")
                 .AndResourceTypes(new[] { "Composition" })
                 .AndMethod("POST")
-                .HandleAsyncWith<DocumentService>((svc, context) => svc.DocumentTypePOST(context));
+                .HandleAsyncWith<DocumentService>((svc, context)
+                    => svc.DocumentTypePOST(context));
 
             return builder;
         }

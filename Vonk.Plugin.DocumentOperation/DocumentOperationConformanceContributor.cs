@@ -24,7 +24,8 @@ namespace Vonk.Plugin.DocumentOperation
             {
                 builder.UseRestComponentEditor(rce =>
                 {
-                    rce.AddOperation(_operationName, "http://hl7.org/fhir/OperationDefinition/Composition-document");
+                    rce.AddOperation(_operationName, 
+                        "http://hl7.org/fhir/OperationDefinition/Composition-document");
                 });
             }
         }
