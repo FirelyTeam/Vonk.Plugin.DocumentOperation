@@ -6,6 +6,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <OutputType>Library</OutputType>
+
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,3 +18,4 @@
   </ItemGroup>
 
 </Project>
+

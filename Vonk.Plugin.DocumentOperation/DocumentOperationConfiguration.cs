@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Vonk.Core.Context;
 using Vonk.Core.Metadata;
 using Vonk.Core.Pluggability;
 using Vonk.Core.Pluggability.ContextAware;
@@ -15,7 +15,8 @@ namespace Vonk.Plugin.DocumentOperation
         public static IServiceCollection ConfigureServices(IServiceCollection services)
         {
             services.TryAddScoped<DocumentService>(); // $document implementation
-            services.TryAddContextAware<ICapabilityStatementContributor, DocumentOperationConformanceContributor>(ServiceLifetime.Transient);  // Add operation to Vonk's CapabilityStatement
+            services.TryAddContextAware<ICapabilityStatementContributor, DocumentOperationConformanceContributor>
+                (ServiceLifetime.Transient);
             return services;
         }
 
@@ -23,8 +24,19 @@ namespace Vonk.Plugin.DocumentOperation
         public static IApplicationBuilder Configure(IApplicationBuilder builder)
         {
             // Register interactions
-            builder.UseVonkInteractionAsync<DocumentService>((svc, context) => svc.DocumentInstanceGET(context), OperationType.Handler);
-            builder.UseVonkInteractionAsync<DocumentService>((svc, context) => svc.DocumentTypePOST(context), OperationType.Handler);
+            builder
+                .OnCustomInteraction(VonkInteraction.instance_custom, "document")
+                .AndResourceTypes(new[] { "Composition" })
+                .AndMethod("GET")
+                .HandleAsyncWith<DocumentService>((svc, context)
+                    => svc.DocumentInstanceGET(context));
+
+            builder
+                .OnCustomInteraction(VonkInteraction.type_custom, "document")
+                .AndResourceTypes(new[] { "Composition" })
+                .AndMethod("POST")
+                .HandleAsyncWith<DocumentService>((svc, context)
+                    => svc.DocumentTypePOST(context));
 
             return builder;
         }
