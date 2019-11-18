@@ -2,8 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Vonk.Core.Context;
+using Vonk.Core.Metadata;
 using Vonk.Core.Pluggability;
-using Vonk.Core.Support;
+using Vonk.Core.Pluggability.ContextAware;
 
 namespace Vonk.Plugin.DocumentOperation
 {
