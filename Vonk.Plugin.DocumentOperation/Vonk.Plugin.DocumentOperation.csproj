@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Vonk.Core" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

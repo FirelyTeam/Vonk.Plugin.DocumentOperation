@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Vonk.Core.Context;
 using Vonk.Core.Metadata;
 using Vonk.Core.Pluggability;
-using Vonk.Core.Pluggability.ContextAware;
+using Vonk.Core.Support;
 
 namespace Vonk.Plugin.DocumentOperation
 {
@@ -16,7 +16,7 @@ namespace Vonk.Plugin.DocumentOperation
         {
             services.TryAddScoped<DocumentService>(); // $document implementation
             services.AddIfNotExists
-                <IConformanceContributor, DocumentOperationConformanceContributor>
+                <ICapabilityStatementContributor, DocumentOperationConformanceContributor>
                 (ServiceLifetime.Transient);
             return services;
         }
