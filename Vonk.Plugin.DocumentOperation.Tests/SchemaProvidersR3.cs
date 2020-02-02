@@ -54,7 +54,7 @@ namespace Vonk.Test.Utils
             {
                 var hostingEnv = new Mock<IHostingEnvironment>();
                 hostingEnv.Setup(he => he.ContentRootPath).Returns(Directory.GetCurrentDirectory());
-                var zipLocator = new SpecificationZipLocator(hostingEnv.Object, Logger<SpecificationZipLocator>());
+                var zipLocator = new SpecificationZipLocator(hostingEnv.Object.ContentRootPath, Logger<SpecificationZipLocator>());
                 _coreResolver = new SpecificationZipResolverR3(zipLocator, Logger<SpecificationZipResolverR3>());
 
                 _customSds = customSds;
