@@ -2,8 +2,8 @@
 
   <!-- Solution-wide properties for NuGet packaging -->
   <PropertyGroup>
-    <VersionPrefix>1.5.0</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
+    <VersionPrefix>1.6.0</VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
     <Authors>Firely - Alexander Zautke, Christiaan Knaap, Marco Visser</Authors>
     <Company>Firely (https://fire.ly)</Company>
     <Copyright>Copyright 2013-2019 Firely</Copyright>
