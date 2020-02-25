@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
-using Vonk.Core.Pluggability;
 using Vonk.Core.Repository;
 using Vonk.Core.Support;
 using static Vonk.Core.Context.VonkOutcome;
@@ -25,7 +24,10 @@ namespace Vonk.Plugin.DocumentOperation
         private readonly IStructureDefinitionSummaryProvider _schemaProvider;
         private readonly ILogger<DocumentService> _logger;
 
-        public DocumentService(ISearchRepository searchRepository, IResourceChangeRepository changeRepository, IStructureDefinitionSummaryProvider schemaProvider, ILogger<DocumentService> logger)
+        public DocumentService(ISearchRepository searchRepository,
+            IResourceChangeRepository changeRepository,
+            IStructureDefinitionSummaryProvider schemaProvider,
+            ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
             Check.NotNull(changeRepository, nameof(changeRepository));
@@ -41,14 +43,12 @@ namespace Vonk.Plugin.DocumentOperation
         /// </summary>
         /// <param name="vonkContext">IVonkContext for details of the request and providing the response</param>
         /// <returns></returns>
-        [InteractionHandler(VonkInteraction.instance_custom, CustomOperation = "document", Method = "GET", AcceptedTypes = new string[] { "Composition" })]
         public async Task DocumentInstanceGET(IVonkContext vonkContext)
         {
             var compositionID = vonkContext.Arguments.ResourceIdArgument().ArgumentValue;
             await Document(vonkContext, compositionID);
         }
 
-        [InteractionHandler(VonkInteraction.type_custom, CustomOperation = "document", Method = "POST", AcceptedTypes = new string[] { "Composition" })]
         public async Task DocumentTypePOST(IVonkContext context)
         {
             var (request, _, response) = context.Parts();
@@ -187,7 +187,8 @@ namespace Vonk.Plugin.DocumentOperation
                         documentBundle = documentBundle.AddEntry(resolvedResource, referenceValue);
                         includedReferences.Add(referenceValue);
                     }
-                    else{
+                    else
+                    {
                         break;
                     }
 
@@ -213,7 +214,7 @@ namespace Vonk.Plugin.DocumentOperation
             bundleResourceNode.Add(identifier);
 
             var documentBundle = GenericBundle.FromBundle(bundleResourceNode);
-            documentBundle.Meta(Guid.NewGuid().ToString(), DateTimeOffset.Now);
+            documentBundle = documentBundle.Meta(Guid.NewGuid().ToString(), DateTimeOffset.Now);
 
             return documentBundle;
         }
