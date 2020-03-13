@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.4.0 - 2019-11-13
+
+- Built against Vonk 3.2.0
+- Compatible with Vonk 3.2.0, Vonk 3.3.0
+- Internal upgrade of the FHIR .NET API to version 1.5.0
+- Assigns an id and lastUpdated to the result bundle
+
+## 1.3.0 - 2019-11-13
+
+- Built against Vonk 3.0.0
+- Compatible with Vonk 3.0.0, 3.1.0
+- Internal improvements of unit tests
+- Functionally equivalent to version 1.3.0
+
 ## 1.3.0 - 2019-10-25
 
 ### Changed
