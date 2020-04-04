@@ -3,20 +3,13 @@
   <Import Project="..\Vonk.Plugin.DocumentOperation.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
-    <OutputType>Library</OutputType>
-
+    <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Vonk.Core" Version="$(VonkVersion)">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Properties\launchSettings.json" />
   </ItemGroup>
 
 </Project>
