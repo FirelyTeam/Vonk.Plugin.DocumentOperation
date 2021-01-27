@@ -37,7 +37,7 @@ stages:
     parameters:
       restoreDependencies: true
       nuGetServiceConnections: VonkPackageCredentials
-      nuGetSources: https://www.myget.org/F/vonk/api/v3/index.json 
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
       pool:
         vmImage: windows-latest
 - stage: deploy
