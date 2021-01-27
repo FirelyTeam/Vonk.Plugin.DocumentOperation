@@ -31,7 +31,6 @@ stages:
     parameters:
       packageArtifacts: false
       restoreDependencies: true
-      restoreDependencies: true
       nuGetServiceConnections: VonkPackageCredentials
       nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
       pool:
