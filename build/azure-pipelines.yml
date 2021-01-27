@@ -30,14 +30,15 @@ stages:
   - template: build.yml@templates  # Template reference
     parameters:
       packageArtifacts: false
+      restoreDependencies: true
+      restoreDependencies: true
+      nuGetServiceConnections: VonkPackageCredentials
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
       pool:
         vmImage: windows-latest
            
   - template: publish-plugin.yml@templates  # Template reference
     parameters:
-      restoreDependencies: true
-      nuGetServiceConnections: VonkPackageCredentials
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
       pool:
         vmImage: windows-latest
 - stage: deploy
