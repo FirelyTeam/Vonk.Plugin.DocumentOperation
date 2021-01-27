@@ -26,21 +26,13 @@ stages:
     parameters:
       useVersionSuffix: false
       packageArtifacts: false
+      publishArtifacts: true
       restoreDependencies: true
       nuGetServiceConnections: VonkPackageCredentials
       nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
       pool:
         vmImage: windows-latest
            
-  - template: publish-plugin.yml@templates  # Template reference
-    parameters:
-      useVersionSuffix: false
-      restoreDependencies: true
-      nuGetServiceConnections: VonkPackageCredentials
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
-      pool:
-        vmImage: windows-latest
-
 - stage: deploy
   dependsOn: build
   jobs:
