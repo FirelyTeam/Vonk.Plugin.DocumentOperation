@@ -26,6 +26,9 @@ stages:
     parameters:
       useVersionSuffix: false
       packageArtifacts: false
+      restoreDependencies: true
+      nuGetServiceConnections: VonkPackageCredentials
+      nuGetSources: https://www.myget.org/F/vonk/api/v3/index.json 
       pool:
         vmImage: windows-latest
            
