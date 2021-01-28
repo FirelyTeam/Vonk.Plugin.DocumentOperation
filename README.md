@@ -4,7 +4,7 @@
 
 # $document operation for Firely server
 
-This repository implements a plug-in for the Firely Server [(server.fire.ly)](server.fire.ly).<br>
+This repository implements a plug-in for the Firely Server [(server.fire.ly)](https://server.fire.ly).<br>
 It provides the $document operation defined by the FHIR standard (STU3). For more information see [[1]](https://www.hl7.org/fhir/operation-composition-document.html).
 
 ## Getting Started
