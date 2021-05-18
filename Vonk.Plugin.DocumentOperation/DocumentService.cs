@@ -213,8 +213,11 @@ namespace Vonk.Plugin.DocumentOperation
             identifier.Add(SourceNode.Valued("value", Guid.NewGuid().ToString()));
             bundleResourceNode.Add(identifier);
 
+            var now = DateTimeOffset.Now;
+            bundleResourceNode.Add(SourceNode.Valued("timestamp", now.ToFhirDateTimeFormat()));
+
             var documentBundle = GenericBundle.FromBundle(bundleResourceNode);
-            documentBundle = documentBundle.Meta(Guid.NewGuid().ToString(), DateTimeOffset.Now);
+            documentBundle = documentBundle.Meta(Guid.NewGuid().ToString(), now);
 
             return documentBundle;
         }
