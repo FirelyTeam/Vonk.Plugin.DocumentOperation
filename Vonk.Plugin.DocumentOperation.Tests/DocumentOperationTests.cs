@@ -379,6 +379,31 @@ namespace Vonk.Plugin.DocumentOperation.Test
             identifier.Should().NotBeEmpty("A document SHALL contain at least one identifier");
         }
 
+        [Fact]
+        public async Task DocumentBundleShouldContainTimestampBdl10()
+        {
+            var composition = CreateTestCompositionNoReferences();
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceId, "test")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "GET";
+
+            await _documentService.DocumentInstanceGET(testContext);
+
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status200OK, "$document should succeed with HTTP 200 - OK on test composition");
+            testContext.Response.Payload.Should().NotBeNull();
+
+            var timestamp = testContext.Response.Payload.SelectNodes("timestamp").FirstOrDefault();
+            timestamp.Should().NotBeNull("A timestamp must be provided for document bundles - See bdl-10");
+        }
+
         // $document is expected to fail if a resource reference is missing, this should be checked on all levels of recursion.
         // Therefore, we build multiple resources, each with different unresolvable references
 
