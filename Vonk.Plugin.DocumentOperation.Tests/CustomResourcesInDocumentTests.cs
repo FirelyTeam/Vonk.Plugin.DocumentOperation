@@ -1,11 +1,20 @@
+extern alias elem;
+extern alias stu3;
+extern alias stu3spec;
+extern alias ser;
+extern alias sup;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Hl7.Fhir.ElementModel;
-using Hl7.Fhir.Model;
-using Hl7.Fhir.Serialization;
-using Hl7.Fhir.Specification;
+using elem::Hl7.Fhir.ElementModel;
+using sup::Hl7.Fhir.Model;
+using stu3::Hl7.Fhir.Model;
+using ser::Hl7.Fhir.Serialization;
+using stu3::Hl7.Fhir.Serialization;
+using stu3spec::Hl7.Fhir.Specification;
+using elem::Hl7.Fhir.Specification;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -19,6 +28,7 @@ using Vonk.UnitTests.Framework.Helpers;
 using Xunit;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
+using Vonk.UnitTests.Framework.R3;
 
 namespace Vonk.Plugin.DocumentOperation.Test
 {
@@ -35,7 +45,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             var customBasicStructureDefinitionJson = TestResourceReader.ReadTestData("CustomBasic-StructureDefinition-R3.json");
             var customBasicStructureDefinition = new FhirJsonParser().Parse<StructureDefinition>(customBasicStructureDefinitionJson);
 
-            _schemaProvider = SchemaProviders.CreateCustomSchemaProvider(customBasicStructureDefinition);
+            _schemaProvider = SchemaProvidersR3.CreateCustomSchemaProvider(customBasicStructureDefinition);
             _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _schemaProvider, _logger);
         }
 

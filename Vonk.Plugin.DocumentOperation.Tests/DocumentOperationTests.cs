@@ -1,6 +1,14 @@
+extern alias stu3;
+extern alias stu3spec;
+extern alias elem;
+extern alias sup;
+
 using FluentAssertions;
-using Hl7.Fhir.Model;
-using Hl7.Fhir.Specification;
+using sup::Hl7.Fhir.Model;
+using stu3::Hl7.Fhir.Model;
+using stu3spec::Hl7.Fhir.Specification;
+using elem::Hl7.Fhir.Specification;
+using stu3::Hl7.Fhir.Specification;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;

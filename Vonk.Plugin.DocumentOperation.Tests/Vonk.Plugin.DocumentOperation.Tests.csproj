@@ -26,6 +26,29 @@
     </Content>
   </ItemGroup>
 
+  <Target Name="AddPackageAliases" BeforeTargets="ResolveReferences" Outputs="%(PackageReference.Identity)">
+    <ItemGroup>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Core'">
+        <Aliases>stu3</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Specification'">
+        <Aliases>stu3spec</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Support.Poco'">
+        <Aliases>sup</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.ElementModel'">
+        <Aliases>elem</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.ElementModel'">
+        <Aliases>elem</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Serialization'">
+        <Aliases>ser</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="..\Vonk.Plugin.DocumentOperation\Vonk.Plugin.DocumentOperation.csproj" />
   </ItemGroup>
