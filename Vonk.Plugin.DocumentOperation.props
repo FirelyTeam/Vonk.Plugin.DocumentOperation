@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <VonkVersion>4.4.0</VonkVersion>
-    <FhirNetApiVersion>3.0.0</FhirNetApiVersion>
+    <FhirNetApiVersion>3.5.0</FhirNetApiVersion>
   </PropertyGroup>
   
 </Project>
