@@ -110,22 +110,22 @@ namespace Vonk.Plugin.DocumentOperation
             {
                 if (!compositionResolved) // Composition resource, on which the operation is called, does not exist
                 {
-                    _logger.LogTrace("$document called on non-existing Composition/{id}", compositionID);
+                    _logger.LogDebug("$document called on non-existing Composition/{id}", compositionID);
                     CancelDocumentOperation(vonkContext, StatusCodes.Status404NotFound);
                 }
                 else if (error.IssueType.Equals(IssueType.NotFound)) // Local reference reference could not be found
                 {
-                    _logger.LogTrace(error.Details);
+                    _logger.LogDebug(error.Details);
                     CancelDocumentOperation(vonkContext, StatusCodes.Status404NotFound, error);
                 }
                 else if (error.IssueType.Equals(IssueType.NotSupported)) // External reference reference could not be found
                 {
-                    _logger.LogTrace(error.Details);
+                    _logger.LogDebug(error.Details);
                     CancelDocumentOperation(vonkContext, StatusCodes.Status501NotImplemented, error);
                 }
                 else
                 {
-                    _logger.LogTrace(error.Details);
+                    _logger.LogDebug(error.Details);
                     CancelDocumentOperation(vonkContext, StatusCodes.Status500InternalServerError, error);
                 }
 
