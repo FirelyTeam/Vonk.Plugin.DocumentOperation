@@ -2,7 +2,7 @@ extern alias stu3;
 extern alias stu3spec;
 extern alias elem;
 extern alias sup;
-
+using System;
 using FluentAssertions;
 using sup::Hl7.Fhir.Model;
 using stu3::Hl7.Fhir.Model;
@@ -146,7 +146,6 @@ namespace Vonk.Plugin.DocumentOperation.Test
         public async Task DocumentOperationGETReturn404MissingComposition()
         {
             // Let ISearchRepository return no Composition
-            var composition = CreateTestCompositionNoReferences();
             var searchResult = new SearchResult(new List<IResource>(), 0, 0);
             _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
@@ -218,7 +217,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             await _documentService.DocumentInstanceGET(testContext);
 
             // Check response status
-            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status404NotFound, "$document should return HTTP 404 - Not Found error when a reference which is referenced by the composition can't be resolved");
             testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound), "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
@@ -252,7 +251,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             await _documentService.DocumentInstanceGET(testContext);
 
             // Check response status
-            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status404NotFound, "$document should return HTTP 404 - Not Found error when a reference which is referenced by the composition can't be resolved");
             testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound), "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
@@ -290,7 +289,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             await _documentService.DocumentInstanceGET(testContext);
 
             // Check response status
-            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when a reference which is referenced by the composition can't be resolved");
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status404NotFound, "$document should return HTTP 404 - Not Found error when a reference which is referenced by the composition can't be resolved");
             testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotFound), "OperationOutcome should explicitly mention that the reference could not be found");
         }
 
@@ -313,7 +312,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("List")), It.IsAny<SearchOptions>())).ReturnsAsync(listSearchResults);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("MedicationStatement")), It.IsAny<SearchOptions>())).ReturnsAsync(medcationStatementSearchResult);
-            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Medication")), It.IsAny<SearchOptions>())).ReturnsAsync(medcationStatementSearchResult);
+            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Medication")), It.IsAny<SearchOptions>())).ReturnsAsync(medicationSearchResult);
 
             // Create VonkContext for $document (GET / Instance level)
             var testContext = new VonkTestContext(VonkInteraction.instance_custom);
@@ -334,10 +333,10 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationInternalServerErrorOnExternalReference()
+        public async Task DocumentOperationNotImplementedErrorOnExternalReference()
         {
             // Setup Composition resource
-            var composition = CreateTestCompositionAbsoulteReferences(); // External reference (patient resource) in the composition resource
+            var composition = CreateTestCompositionAbsoluteReferences(); // External reference (patient resource) in the composition resource
             var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
 
@@ -355,7 +354,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             await _documentService.DocumentInstanceGET(testContext);
 
             // Check response status
-            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should return HTTP 500 - Internal Server error when an external reference is referenced by the composition");
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status501NotImplemented, "$document should return HTTP 501 - Not Implemented error when an external reference is referenced by the composition");
             testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.NotSupported), "OperationOutcome should highlight that this feature is not supported");
         }
 
@@ -412,6 +411,30 @@ namespace Vonk.Plugin.DocumentOperation.Test
             timestamp.Should().NotBeNull("A timestamp must be provided for document bundles - See bdl-10");
         }
 
+        [Fact]
+        public async Task DocumentOperationCatchesSearchRepositoryException()
+        {
+            var composition = CreateTestCompositionInclList();
+            var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceId, "test")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "GET";
+            
+            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("Composition")), It.IsAny<SearchOptions>())).ReturnsAsync(compositionSearchResult);
+            _searchMock.Setup(repo => repo.Search(It.Is<IArgumentCollection>(arg => arg.GetArgument("_type").ArgumentValue.Equals("List")), It.IsAny<SearchOptions>())).Throws<Exception>();
+            
+            await _documentService.DocumentInstanceGET(testContext);
+            
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status500InternalServerError, "$document should fail with HTTP 500 - Internal Server Error on test composition");
+            testContext.Response.Outcome.Issues.Should().Contain(issue => issue.IssueType.Equals(VonkOutcome.IssueType.Exception), "OperationOutcome should indicate exception");
+        }
+
         // $document is expected to fail if a resource reference is missing, this should be checked on all levels of recursion.
         // Therefore, we build multiple resources, each with different unresolvable references
 
@@ -420,7 +443,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
             return new Composition() { Id = "test", VersionId = "v1" }.ToIResource();
         }
 
-        private IResource CreateTestCompositionAbsoulteReferences()
+        private IResource CreateTestCompositionAbsoluteReferences()
         {
             return new Composition() { Id = "test", VersionId = "v1", Subject = new ResourceReference("https://vonk.fire.ly/Patient/test") }.ToIResource();
         }
@@ -468,10 +491,6 @@ namespace Vonk.Plugin.DocumentOperation.Test
         {
             return new Medication { Id = "test" }.ToIResource();
         }
-
-        private IResource CreateBundle()
-        {
-            return new Bundle() { Id = "test", VersionId = "v1" }.ToIResource();
-        }
+        
     }
 }

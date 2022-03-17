@@ -113,15 +113,22 @@ namespace Vonk.Plugin.DocumentOperation
                     _logger.LogTrace("$document called on non-existing Composition/{id}", compositionID);
                     CancelDocumentOperation(vonkContext, StatusCodes.Status404NotFound);
                 }
-                else if (error.Equals(VonkIssue.PROCESSING_ERROR))
+                else if (error.IssueType.Equals(IssueType.NotFound)) // Local reference reference could not be found
                 {
-                    _logger.LogTrace("$document failed to include resource in correct information model", compositionID);
-                    CancelDocumentOperation(vonkContext, StatusCodes.Status415UnsupportedMediaType, error);
+                    _logger.LogTrace(error.Details);
+                    CancelDocumentOperation(vonkContext, StatusCodes.Status404NotFound, error);
                 }
-                else // Local or external reference reference could not be found
+                else if (error.IssueType.Equals(IssueType.NotSupported)) // External reference reference could not be found
                 {
+                    _logger.LogTrace(error.Details);
+                    CancelDocumentOperation(vonkContext, StatusCodes.Status501NotImplemented, error);
+                }
+                else
+                {
+                    _logger.LogTrace(error.Details);
                     CancelDocumentOperation(vonkContext, StatusCodes.Status500InternalServerError, error);
                 }
+
                 return;
             }
 
@@ -226,12 +233,12 @@ namespace Vonk.Plugin.DocumentOperation
 
         #region Helper - Resolve resources
 
-        private async Task<(bool success, IResource resolvedResource, VonkIssue failedReference)> ResolveResource(string id, string type)
+        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveResource(string id, string type)
         {
             return await ResolveResource(type + "/" + id);
         }
 
-        private async Task<(bool success, IResource resolvedResource, VonkIssue failedReference)> ResolveResource(string reference)
+        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveResource(string reference)
         {
             if (IsRelativeUrl(reference))
                 return await ResolveLocalResource(reference);
@@ -240,13 +247,21 @@ namespace Vonk.Plugin.DocumentOperation
             return (false, null, ReferenceNotResolvedIssue(reference, false));
         }
 
-        private async Task<(bool success, IResource resolvedResource, VonkIssue failedReference)> ResolveLocalResource(string reference)
+        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveLocalResource(string reference)
         {
-            var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
-            if (result == null)
-                return (false, null, ReferenceNotResolvedIssue(reference, true));
+            try
+            {
+                var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
+                if (result == null)
+                    return (false, null, ReferenceNotResolvedIssue(reference, true));
 
-            return (true, result, null);
+                return (true, result, null);
+            }
+            catch (Exception e)
+            {
+                _logger.LogDebug($"Internal server error occurred while executing $document. Details: {e.Message}");
+                return (false, null, InternalServerError());
+            }
         }
 
         private bool IsRelativeUrl(string reference)
@@ -293,6 +308,11 @@ namespace Vonk.Plugin.DocumentOperation
         private VonkIssue WrongInformationModel(string expectedInformationModel, IResource resolvedResource)
         {
             return new VonkIssue(VonkIssue.PROCESSING_ERROR.Severity, VonkIssue.PROCESSING_ERROR.IssueType, details: $"Found {resolvedResource.Type}/{resolvedResource.Id} in information model {resolvedResource.InformationModel}. Expected information model {expectedInformationModel} instead.");
+        }
+
+        private VonkIssue InternalServerError()
+        {
+            return VonkIssue.INTERNAL_ERROR.CloneWithDetails("Internal server error occurred while executing $document. Please see server logs for more details");
         }
 
     }
