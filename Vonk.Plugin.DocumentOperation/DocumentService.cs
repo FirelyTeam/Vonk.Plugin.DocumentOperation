@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
+using Vonk.Core.Context.Http;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
 using Vonk.Core.Support;
@@ -84,7 +85,7 @@ namespace Vonk.Plugin.DocumentOperation
         public async Task Document(IVonkContext vonkContext, string compositionID)
         {
             // Build empty document bundle
-            var documentBundle = CreateEmptyBundle();
+            var documentBundle = CreateEmptyBundle(vonkContext.InformationModel);
 
             vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
 
@@ -211,7 +212,7 @@ namespace Vonk.Plugin.DocumentOperation
 
         #region Helper - Bundle-related
 
-        private GenericBundle CreateEmptyBundle()
+        private GenericBundle CreateEmptyBundle(string informationModel)
         {
             var bundleResourceNode = SourceNode.Resource("Bundle", "Bundle", SourceNode.Valued("type", "document"));
 
@@ -219,9 +220,12 @@ namespace Vonk.Plugin.DocumentOperation
             identifier.Add(SourceNode.Valued("system", "urn:ietf:rfc:3986"));
             identifier.Add(SourceNode.Valued("value", Guid.NewGuid().ToString()));
             bundleResourceNode.Add(identifier);
-
+            
             var now = DateTimeOffset.Now;
-            bundleResourceNode.Add(SourceNode.Valued("timestamp", now.ToFhirDateTimeFormat()));
+            if (!VonkConstants.Model.FhirR3.Equals(informationModel))
+            {
+                bundleResourceNode.Add(SourceNode.Valued("timestamp", now.ToFhirDateTimeFormat()));
+            }
 
             var documentBundle = GenericBundle.FromBundle(bundleResourceNode);
             documentBundle = documentBundle.Meta(Guid.NewGuid().ToString(), now);
