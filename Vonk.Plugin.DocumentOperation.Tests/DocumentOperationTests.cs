@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using elem::Hl7.Fhir.ElementModel;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
@@ -389,11 +390,11 @@ namespace Vonk.Plugin.DocumentOperation.Test
         [Fact]
         public async Task DocumentBundleShouldContainTimestampBdl10()
         {
-            var composition = CreateTestCompositionNoReferences();
+            var composition = CreateTestCompositionNoReferences(VonkConstants.Model.FhirR4);
             var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
             _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
 
-            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom, VonkConstants.Model.FhirR4);
             testContext.Arguments.AddArguments(new[]
             {
                 new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
@@ -438,9 +439,12 @@ namespace Vonk.Plugin.DocumentOperation.Test
         // $document is expected to fail if a resource reference is missing, this should be checked on all levels of recursion.
         // Therefore, we build multiple resources, each with different unresolvable references
 
-        private IResource CreateTestCompositionNoReferences()
+        private IResource CreateTestCompositionNoReferences(string informationModel = VonkConstants.Model.FhirR3)
         {
-            return new Composition() { Id = "test", VersionId = "v1" }.ToIResource();
+            var composition = SourceNode.Resource("Composition", "Composition");
+            composition.Add(SourceNode.Valued("id", "test"));
+            composition.Add(SourceNode.Node("meta", SourceNode.Valued("versionId", "v1")));
+            return composition.ToIResource(informationModel);
         }
 
         private IResource CreateTestCompositionAbsoluteReferences()
