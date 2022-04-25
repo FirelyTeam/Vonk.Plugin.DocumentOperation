@@ -94,7 +94,7 @@ namespace Vonk.UnitTests.Framework.R3
                     if (item.Value is StructureDefinition sd && !sd.HasSnapshot)
                     {
                         var snapShotGenerator = new SnapshotGenerator(_coreResolver);
-                        snapShotGenerator.Update(sd);
+                        snapShotGenerator.UpdateAsync(sd).GetAwaiter().GetResult();
                     }
                 }
             }
