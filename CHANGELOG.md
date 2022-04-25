@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## 1.7.1 - 2022-04-25
+
+- Add Bundle.timestamp to the document in order to create a valid document bundle. See [bdl-10](https://www.hl7.org/fhir/bundle.html#invs) constraint.
+- Improved error code handling: differentiate between HTTP 404, 500, and 501
+
+## 1.7.0 - 2021-01-27
+
+- Built against Vonk 4.1.0
+
+## 1.6.0 - 2021-01-27
+
+- Built against Vonk 4.0.0
+
+## 1.5.0 - 2020-02-35
+
+- Built against Vonk 3.2.1
+- Add licensing information to DocumentOperationConfiguration
+
 ## 1.4.0 - 2019-11-13
 
 - Built against Vonk 3.2.0
