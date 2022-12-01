@@ -29,20 +29,23 @@ stages:
   jobs:
   - template: build.yml@templates  # Template reference
     parameters:
+      dotNetCoreVersion: '6.0.x' 
+      nuGetServiceConnections: VonkPackageCredentials
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json
       packageArtifacts: false
       publishArtifacts: true
-      restoreDependencies: true
-      nuGetServiceConnections: VonkPackageCredentials
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
       pool:
         vmImage: windows-latest
-  
+      restoreDependencies: true
+
+
 - stage: deploy
   dependsOn: build
   jobs:
   - template: deploy-plugin.yml@templates
     parameters:
-      pool:
-        vmImage: windows-latest      
       packageName: vonk.plugin.documentoperation
       packageDescription: 'Vonk Plugin implementing FHIR `$document` operation'      
+      pool:
+        vmImage: windows-latest      
+      

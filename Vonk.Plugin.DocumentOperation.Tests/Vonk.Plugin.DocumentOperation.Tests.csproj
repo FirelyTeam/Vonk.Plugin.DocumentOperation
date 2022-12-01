@@ -3,7 +3,7 @@
   <Import Project="..\Vonk.Plugin.DocumentOperation.props" />
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -36,9 +36,6 @@
       </ReferencePath>
       <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Support.Poco'">
         <Aliases>sup</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.ElementModel'">
-        <Aliases>elem</Aliases>
       </ReferencePath>
       <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.ElementModel'">
         <Aliases>elem</Aliases>
