@@ -28,8 +28,8 @@ stages:
       packageArtifacts: false
       publishArtifacts: true
       restoreDependencies: true
-      nuGetServiceConnections: VonkPackageCredentials
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
+      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
       pool:
         vmImage: windows-latest
            
@@ -38,6 +38,10 @@ stages:
   jobs:
   - template: deploy-plugin.yml@templates
     parameters:
+      restoreDependencies: true
+      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
+      dotNetCoreVersion: '6.0.x'
       pool:
         vmImage: windows-latest      
       packageName: vonk.plugin.documentoperation
