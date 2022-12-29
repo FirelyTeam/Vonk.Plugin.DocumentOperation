@@ -30,13 +30,22 @@ stages:
   - template: build.yml@templates  # Template reference
     parameters:
       dotNetCoreVersion: '6.0.x' 
-      nuGetServiceConnections: VonkPackageCredentials
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json
+      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
       packageArtifacts: false
-      publishArtifacts: true
+      publishArtifacts: false
       pool:
         vmImage: windows-latest
       restoreDependencies: true
+      
+  - template: publish-plugin.yml@templates  # Template reference
+    parameters:
+      restoreDependencies: true
+      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
+      dotNetCoreVersion: '6.0.x'
+      pool:
+         vmImage: windows-latest
 
 
 - stage: deploy
