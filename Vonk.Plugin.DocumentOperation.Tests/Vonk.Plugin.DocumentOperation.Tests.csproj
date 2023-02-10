@@ -14,33 +14,27 @@
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="FluentAssertions" Version="6.9.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Hl7.Fhir.Specification.STU3" Version="$(FhirNetApiVersion)" GeneratePathProperty="true" ExcludeAssets="contentFiles" />
+    <PackageReference Include="Vonk.Fhir.R3" Version="$(VonkVersion)" />
+    <PackageReference Include="Hl7.Fhir.STU3" Version="$(FhirNetApiVersion)" />
+    <PackageReference Include="Hl7.Fhir.Specification.Data.STU3" Version="$(FhirNetApiVersion)" GeneratePathProperty="true" ExcludeAssets="contentFiles" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="$(PkgHl7_Fhir_Specification_STU3)\contentFiles\any\any\specification.zip">
+    <Content Include="$(PkgHl7_Fhir_Specification_Data_STU3)\contentFiles\any\any\specification.zip">
       <Link>specification_Fhir3_0.zip</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <Pack>false</Pack>
     </Content>
   </ItemGroup>
 
   <Target Name="AddPackageAliases" BeforeTargets="ResolveReferences" Outputs="%(PackageReference.Identity)">
     <ItemGroup>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Core'">
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3'">
         <Aliases>stu3</Aliases>
       </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.STU3.Specification'">
-        <Aliases>stu3spec</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Support.Poco'">
-        <Aliases>sup</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.ElementModel'">
-        <Aliases>elem</Aliases>
-      </ReferencePath>
-      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Serialization'">
-        <Aliases>ser</Aliases>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Base'">
+        <Aliases>base</Aliases>
       </ReferencePath>
     </ItemGroup>
   </Target>
