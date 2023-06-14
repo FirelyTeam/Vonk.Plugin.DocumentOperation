@@ -13,7 +13,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="FluentAssertions" Version="6.11.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
     <PackageReference Include="Vonk.Fhir.R3" Version="$(VonkVersion)" />
     <PackageReference Include="Hl7.Fhir.STU3" Version="$(FhirNetApiVersion)" />
     <PackageReference Include="Hl7.Fhir.Specification.Data.STU3" Version="$(FhirNetApiVersion)" GeneratePathProperty="true" ExcludeAssets="contentFiles" />
