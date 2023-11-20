@@ -25,6 +25,7 @@ stages:
   - template: build.yml@templates  # Template reference
     parameters:
       useVersionSuffix: false
+      propsFile: 'Vonk.Plugin.DocumentOperation.props'
       restoreDependencies: true
       nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
       nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
