@@ -24,6 +24,7 @@ stages:
   jobs:
   - template: build.yml@templates  # Template reference
     parameters:
+      dotNetCoreVersion: '6.0.x'
       useVersionSuffix: false
       propsFile: 'Vonk.Plugin.DocumentOperation.props'
       restoreDependencies: true
@@ -47,7 +48,8 @@ stages:
   jobs:
   - template: deploy-plugin.yml@templates
     parameters:
+      packageName: vonk.plugin.documentoperation
+      packageDescription: 'Vonk Plugin implementing FHIR `$document` operation'
       pool:
         vmImage: windows-latest      
-      packageName: vonk.plugin.documentoperation
-      packageDescription: 'Vonk Plugin implementing FHIR `$document` operation'      
+
