@@ -11,8 +11,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VonkVersion>5.*-*</VonkVersion>
-    <FhirNetApiVersion>5.*-*</FhirNetApiVersion>
+    <VonkVersion>5.*</VonkVersion>
+    <FhirNetApiVersion>5.*</FhirNetApiVersion>
   </PropertyGroup>
   
 </Project>
