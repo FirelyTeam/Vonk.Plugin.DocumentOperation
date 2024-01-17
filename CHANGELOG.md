@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## 1.8.0 - 2024-01-17
 
 - Built against Vonk 5.4.1
-- Internal upgrade of the FHIR .NET API to version 5.5.1
+- Internal upgrade of the FHIR .NET API to version 5.3.0
 
 ## 1.7.1 - 2022-04-25
 
