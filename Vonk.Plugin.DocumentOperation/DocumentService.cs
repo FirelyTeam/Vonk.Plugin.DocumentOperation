@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
-using Vonk.Core.Context.Http;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
 using Vonk.Core.Support;

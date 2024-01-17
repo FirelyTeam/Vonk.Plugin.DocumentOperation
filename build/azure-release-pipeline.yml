@@ -24,21 +24,32 @@ stages:
   jobs:
   - template: build.yml@templates  # Template reference
     parameters:
+      dotNetCoreVersion: '6.0.x'
       useVersionSuffix: false
-      packageArtifacts: false
-      publishArtifacts: true
+      propsFile: 'Vonk.Plugin.DocumentOperation.props'
       restoreDependencies: true
-      nuGetServiceConnections: VonkPackageCredentials
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json 
+      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
       pool:
         vmImage: windows-latest
+        
+  - template: publish-plugin.yml@templates  # Template reference
+    parameters:
+      restoreDependencies: true
+      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
+      dotNetCoreVersion: '6.0.x'
+      useVersionSuffix: false
+      pool:
+         vmImage: windows-latest
            
 - stage: deploy
   dependsOn: build
   jobs:
   - template: deploy-plugin.yml@templates
     parameters:
+      packageName: vonk.plugin.documentoperation
+      packageDescription: 'Vonk Plugin implementing FHIR `$document` operation'
       pool:
         vmImage: windows-latest      
-      packageName: vonk.plugin.documentoperation
-      packageDescription: 'Vonk Plugin implementing FHIR `$document` operation'      
+

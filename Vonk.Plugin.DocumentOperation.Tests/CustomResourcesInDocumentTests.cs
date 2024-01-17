@@ -1,34 +1,30 @@
-extern alias elem;
+extern alias @base;
 extern alias stu3;
-extern alias stu3spec;
-extern alias ser;
-extern alias sup;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using elem::Hl7.Fhir.ElementModel;
-using sup::Hl7.Fhir.Model;
-using stu3::Hl7.Fhir.Model;
-using ser::Hl7.Fhir.Serialization;
+using @base::Hl7.Fhir.ElementModel;
+using @base::Hl7.Fhir.Model;
+using @base::Hl7.Fhir.Specification;
 using stu3::Hl7.Fhir.Serialization;
-using stu3spec::Hl7.Fhir.Specification;
-using elem::Hl7.Fhir.Specification;
+using stu3::Hl7.Fhir.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Xunit;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
+using Vonk.Test.Utils;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
-using Vonk.Fhir.R3;
-using Vonk.Test.Utils;
+using Vonk.UnitTests.Framework.R3;
 using Vonk.UnitTests.Framework.Helpers;
-using Xunit;
+using Vonk.Fhir.R3;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
-using Vonk.UnitTests.Framework.R3;
+using static Vonk.Fhir.FhirResourceExtensions;
 
 namespace Vonk.Plugin.DocumentOperation.Test
 {
