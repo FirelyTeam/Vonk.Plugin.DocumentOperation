@@ -38,7 +38,7 @@ stages:
       restoreDependencies: true
       nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
       nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
-      dotNetCoreVersion: '6.0.x'
+      dotNetCoreVersion: '8.0.x'
       useVersionSuffix: false
       pool:
          vmImage: windows-latest
