@@ -8,11 +8,12 @@
     <Company>Firely (https://fire.ly)</Company>
     <Copyright>Copyright 2013-2019 Firely</Copyright>
     <RepositoryType>git</RepositoryType>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
     <VonkVersion>5.*-*</VonkVersion>
-    <FhirNetApiVersion>5.6.*</FhirNetApiVersion>
+    <FhirNetApiVersion>5.7.*</FhirNetApiVersion>
   </PropertyGroup>
   
 </Project>
