@@ -3,7 +3,6 @@
   <Import Project="..\Vonk.Plugin.DocumentOperation.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
