@@ -8,7 +8,10 @@ using Vonk.Core.Pluggability.ContextAware;
 
 namespace Vonk.Plugin.DocumentOperation
 {
-    [VonkConfiguration(order: 4900, isLicensedAs: "http://fire.ly/vonk/plugins/document")]
+    
+    [InternalVonkConfiguration(order: 4900, isLicensedAs: "http://fire.ly/vonk/plugins/document")]
+    //  If you are a 3rd-party developer, please use the attribute below instead
+    // [VonkConfiguration(order: 4900)] 
     public static class DocumentOperationConfiguration
     {
         // Add services here to the DI system of ASP.NET Core
