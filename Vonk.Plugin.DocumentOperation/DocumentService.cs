@@ -254,7 +254,19 @@ namespace Vonk.Plugin.DocumentOperation
         {
             try
             {
-                var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
+                var resourceKey = ResourceKey.Parse(reference);
+                SearchOptions options;
+                if (resourceKey.HasVersion())
+                {
+                    options = SearchOptions.History(null, VonkInteraction.instance_vread);
+                }
+                else
+                {
+                    options = SearchOptions.Latest(null, VonkInteraction.instance_read);
+                }
+                options.EnforceContextAuthorization = true;
+                
+                var result = await _searchRepository.GetByKey(resourceKey, options);
                 if (result == null)
                     return (false, null, ReferenceNotResolvedIssue(reference, true));
 
@@ -317,6 +329,5 @@ namespace Vonk.Plugin.DocumentOperation
         {
             return VonkIssue.INTERNAL_ERROR.CloneWithDetails("Internal server error occurred while executing $document. Please see server logs for more details");
         }
-
     }
 }
