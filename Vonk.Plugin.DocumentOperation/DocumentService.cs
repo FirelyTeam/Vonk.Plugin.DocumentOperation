@@ -87,9 +87,12 @@ namespace Vonk.Plugin.DocumentOperation
             var documentBundle = CreateEmptyBundle(vonkContext.InformationModel);
 
             vonkContext.Arguments.Handled(); // Signal to Vonk -> Mark arguments as "done"
+            
 
             // Get Composition resource
-            (var compositionResolved, var resolvedResource, var error) = await ResolveResource(compositionID, "Composition");
+            SearchOptions options = SearchOptions.Latest(vonkContext.ServerBase, VonkInteraction.instance_read);
+            options = options.WithAuthorization(vonkContext);
+            (var compositionResolved, var resolvedResource, var error) = await ResolveResource(options, "Composition/compositionID");
             if (compositionResolved)
             {
                 if (resolvedResource.InformationModel != vonkContext.InformationModel)
@@ -102,7 +105,7 @@ namespace Vonk.Plugin.DocumentOperation
                 documentBundle = documentBundle.AddEntry(resolvedResource, "Composition/" + compositionID);
 
                 // Recursively resolve and include all references in the search bundle, overwrite documentBundle as GenericBundle is immutable
-                (_, documentBundle, error) = await IncludeReferencesInBundle(resolvedResource, documentBundle);
+                (_, documentBundle, error) = await IncludeReferencesInBundle(options, resolvedResource, documentBundle);
             }
 
             // Handle responses
@@ -148,26 +151,30 @@ namespace Vonk.Plugin.DocumentOperation
         /// This function traverses recursively through all references until no new references are found.
         /// No depth-related limitations.
         /// </summary>
+        /// <param name="options"></param>
         /// <param name="startResource">First resource which potentially contains references that need to be included in the document</param>
         /// <param name="searchBundle">FHIR Search Bundle to which the resolved resources shall be added as includes</param>
         /// <returns>
         /// - success describes if all references could recursively be found, starting from the given resource
         /// - failedReference contains the first reference that could not be resolved, empty if all resources can be resolved
         /// </returns>
-        private async Task<(bool success, GenericBundle documentBundle, VonkIssue error)> IncludeReferencesInBundle(IResource startResource, GenericBundle searchBundle)
+        private async Task<(bool success, GenericBundle documentBundle, VonkIssue error)> IncludeReferencesInBundle(SearchOptions options, IResource startResource,
+            GenericBundle searchBundle)
         {
             var includedReferences = new HashSet<string>();
-            return await IncludeReferencesInBundle(startResource, searchBundle, includedReferences);
+            return await IncludeReferencesInBundle(options, startResource, searchBundle, includedReferences);
         }
 
         /// <summary>
         /// Overloaded method for recursive use.
         /// </summary>
+        /// <param name="options"></param>
         /// <param name="resource"></param>
         /// <param name="documentBundle"></param>
         /// <param name="includedReferences">Remember which resources were already added to the search bundle</param>
         /// <returns></returns>
-        private async Task<(bool success, GenericBundle documentBundle, VonkIssue error)> IncludeReferencesInBundle(IResource resource, GenericBundle documentBundle, HashSet<string> includedReferences)
+        private async Task<(bool success, GenericBundle documentBundle, VonkIssue error)> IncludeReferencesInBundle(SearchOptions options, IResource resource,
+            GenericBundle documentBundle, HashSet<string> includedReferences)
         {
             // Get references of given resource
             var allReferencesInResourceQuery = "$this.descendants().where($this is Reference).reference";
@@ -183,7 +190,7 @@ namespace Vonk.Plugin.DocumentOperation
                 var referenceValue = reference.Value.ToString();
                 if (!referenceValue.StartsWith("#", StringComparison.Ordinal) && !includedReferences.Contains(referenceValue))
                 {
-                    (successfulResolve, resolvedResource, error) = await ResolveResource(referenceValue);
+                    (successfulResolve, resolvedResource, error) = await ResolveResource(options, referenceValue);
                     if(successfulResolve){
 
                         if(resource.InformationModel != resolvedResource.InformationModel)
@@ -200,7 +207,7 @@ namespace Vonk.Plugin.DocumentOperation
                     }
 
                     // Recursively resolve all references in the included resource
-                    (successfulResolve, documentBundle, error) = await IncludeReferencesInBundle(resolvedResource, documentBundle, includedReferences);
+                    (successfulResolve, documentBundle, error) = await IncludeReferencesInBundle(options, resolvedResource, documentBundle, includedReferences);
                     if(!successfulResolve){
                         break;
                     }
@@ -236,25 +243,20 @@ namespace Vonk.Plugin.DocumentOperation
 
         #region Helper - Resolve resources
 
-        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveResource(string id, string type)
-        {
-            return await ResolveResource(type + "/" + id);
-        }
-
-        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveResource(string reference)
+        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveResource(SearchOptions options, string reference)
         {
             if (IsRelativeUrl(reference))
-                return await ResolveLocalResource(reference);
+                return await ResolveLocalResource(options, reference);
 
             // Server chooses not to handle absolute (remote) references
             return (false, null, ReferenceNotResolvedIssue(reference, false));
         }
 
-        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveLocalResource(string reference)
+        private async Task<(bool success, IResource resolvedResource, VonkIssue error)> ResolveLocalResource(SearchOptions options, string reference)
         {
             try
             {
-                var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference));
+                var result = await _searchRepository.GetByKey(ResourceKey.Parse(reference), options);
                 if (result == null)
                     return (false, null, ReferenceNotResolvedIssue(reference, true));
 
