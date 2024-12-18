@@ -33,7 +33,7 @@ stages:
       propsFile: 'Vonk.Plugin.DocumentOperation.props'
       restoreDependencies: true
       nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
+      nuGetSources: --source https://nuget.pkg.github.com/FirelyTeam/index.json
       packageArtifacts: false
       publishArtifacts: false
       pool:
@@ -43,7 +43,7 @@ stages:
     parameters:
       restoreDependencies: true
       nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
-      nuGetSources: --source https://www.myget.org/F/vonk/api/v3/index.json --source https://nuget.pkg.github.com/FirelyTeam/index.json
+      nuGetSources: --source https://nuget.pkg.github.com/FirelyTeam/index.json
       dotNetCoreVersion: '8.0.x'
       pool:
          vmImage: windows-latest
