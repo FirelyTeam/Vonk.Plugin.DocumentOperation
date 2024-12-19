@@ -24,7 +24,6 @@ using Vonk.UnitTests.Framework.Helpers;
 using Vonk.Fhir.R3;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
-using static Vonk.Fhir.FhirResourceExtensions;
 
 namespace Vonk.Plugin.DocumentOperation.Test
 {

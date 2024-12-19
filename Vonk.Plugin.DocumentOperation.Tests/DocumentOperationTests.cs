@@ -18,6 +18,7 @@ using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
+using Vonk.Core.Security;
 using Vonk.UnitTests.Framework.Helpers;
 using Vonk.Fhir.R3;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
@@ -49,7 +50,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationGETReturn200OnSuccess()
+        public async Task DocumentOperationGET_OnSuccess_Return200()
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
@@ -77,7 +78,39 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationPOSTReturn200OnSuccess()
+        public async Task DocumentOperationGET_CallsSearchRepositoryWithAuthorization()
+        {
+            // Arrange
+            var composition = CreateTestCompositionNoReferences();
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            var authMock = new Mock<IAuthorization>();
+            authMock.Setup(a => a.CanRead("Composition")).Returns(true);
+            authMock.Setup(a => a.CanRead("RestrictedType")).Returns(false);
+            testContext.Features.Set<IAuthorization>(authMock.Object);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceId, "test")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "GET";
+
+            // Act
+            await _documentService.DocumentInstanceGET(testContext);
+
+            // Assert
+            _searchMock.Verify(repo => repo.Search(
+                It.IsAny<IArgumentCollection>(),
+                It.Is<SearchOptions>(options => 
+                    options.Authorization.CanRead("Composition") && !options.Authorization.CanRead("RestrictedType") 
+                )), Times.Once);
+        }
+
+        [Fact]
+        public async Task DocumentOperationPOST_OnSuccess_Returns200()
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
@@ -115,7 +148,48 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationPOSTReturn400OnMissingId()
+        public async Task DocumentOperation_WhenCalledWithIAuthorization_AuthorizationIsPassedToRepository()
+        {
+            // Setup Composition resource
+            var composition = CreateTestCompositionNoReferences();
+            var compositionId = "test";
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(
+                                      It.Is<IArgumentCollection>(args => args.GetArgument(ArgumentNames.resourceId).ArgumentValue == compositionId),
+                                      It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+
+            // Create VonkContext for $document (POST / Type level)
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "POST";
+
+            var parameters = new Parameters();
+            var idValue = new FhirUri(compositionId);
+            var parameterComponent = new Parameters.ParameterComponent { Name = "id" };
+            parameterComponent.Value = idValue;
+            parameters.Parameter.Add(parameterComponent);
+
+            testContext.TestRequest.Payload = new RequestPayload(true, parameters.ToIResource());
+            var authMock = new Mock<IAuthorization>();
+            authMock.Setup(a => a.CanRead("Composition")).Returns(true);
+            authMock.Setup(a => a.CanRead("RestrictedType")).Returns(false);
+            testContext.Features.Set<IAuthorization>(authMock.Object);
+            
+            // Execute $document
+            await _documentService.DocumentTypePOST(testContext);
+            _searchMock.Verify(repo => repo.Search(
+                It.IsAny<IArgumentCollection>(),
+                It.Is<SearchOptions>(options => 
+                        options.Authorization.CanRead("Composition") && !options.Authorization.CanRead("RestrictedType") 
+                )), Times.Once);
+        }
+
+        [Fact]
+        public async Task DocumentOperationPOST_OnMissingId_Return400()
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
@@ -142,7 +216,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationGETReturn404MissingComposition()
+        public async Task DocumentOperationGET_OnMissingComposition_Return404()
         {
             // Let ISearchRepository return no Composition
             var searchResult = new SearchResult(new List<IResource>(), 0, 0);
@@ -166,7 +240,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationShouldPersistBundle()
+        public async Task DocumentOperation_PersistsBundle()
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
@@ -191,7 +265,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationInternalServerErrorOnMissingReference1()
+        public async Task DocumentOperation_OnMissingReference1_InternalServerError()
         {
             var resourceToBeFound = new List<string> { "Composition" };
 
@@ -221,7 +295,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationInternalServerErrorOnMissingReference2()
+        public async Task DocumentOperation_OnMissingReference2_InternalServerError()
         {
             var resourceToBeFound = new List<string> { "Composition", "Patient" };
 
@@ -255,7 +329,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationInternalServerErrorOnMissingReference3()
+        public async Task DocumentOperation_OnMissingReference3_InternalServerError()
         {
             var resourceToBeFound = new List<string> { "Composition", "List", "MedicationStatement" };
 
@@ -293,7 +367,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationSuccessCompleteComposition()
+        public async Task DocumentOperation_OnSuccess_CompletesComposition()
         {
             // Setup Composition resource
             var composition = CreateTestCompositionInclList();
@@ -332,7 +406,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationNotImplementedErrorOnExternalReference()
+        public async Task DocumentOperation_OnExternalReference_ReturnsNotImplementedError()
         {
             // Setup Composition resource
             var composition = CreateTestCompositionAbsoluteReferences(); // External reference (patient resource) in the composition resource
@@ -358,7 +432,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentBundleContainsIdentifier()
+        public async Task DocumentBundle_ContainsIdentifier()
         {
             // Setup Composition resource
             var composition = CreateTestCompositionNoReferences();
@@ -386,7 +460,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentBundleShouldContainTimestampBdl10()
+        public async Task DocumentBundle_ContainsTimestampBdl10()
         {
             var composition = CreateTestCompositionNoReferences(VonkConstants.Model.FhirR4);
             var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
@@ -411,7 +485,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
-        public async Task DocumentOperationCatchesSearchRepositoryException()
+        public async Task DocumentOperation_CatchesSearchRepositoryException()
         {
             var composition = CreateTestCompositionInclList();
             var compositionSearchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
