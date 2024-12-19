@@ -90,9 +90,8 @@ namespace Vonk.Plugin.DocumentOperation
             
 
             // Get Composition resource
-            SearchOptions options = SearchOptions.Latest(vonkContext.ServerBase, VonkInteraction.instance_read);
-            options = options.WithAuthorization(vonkContext);
-            (var compositionResolved, var resolvedResource, var error) = await ResolveResource(options, "Composition/compositionID");
+            SearchOptions options = SearchOptions.Latest(vonkContext.ServerBase, VonkInteraction.instance_read).WithAuthorization(vonkContext);
+            (var compositionResolved, var resolvedResource, var error) = await ResolveResource(options, "Composition/" + compositionID);
             if (compositionResolved)
             {
                 if (resolvedResource.InformationModel != vonkContext.InformationModel)

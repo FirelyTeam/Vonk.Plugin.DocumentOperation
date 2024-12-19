@@ -78,6 +78,38 @@ namespace Vonk.Plugin.DocumentOperation.Test
         }
 
         [Fact]
+        public async Task DocumentOperationGET_CallsSearchRepositoryWithAuthorization()
+        {
+            // Arrange
+            var composition = CreateTestCompositionNoReferences();
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(It.IsAny<IArgumentCollection>(), It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            var authMock = new Mock<IAuthorization>();
+            authMock.Setup(a => a.CanRead("Composition")).Returns(true);
+            authMock.Setup(a => a.CanRead("RestrictedType")).Returns(false);
+            testContext.Features.Set<IAuthorization>(authMock.Object);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceId, "test")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "GET";
+
+            // Act
+            await _documentService.DocumentInstanceGET(testContext);
+
+            // Assert
+            _searchMock.Verify(repo => repo.Search(
+                It.IsAny<IArgumentCollection>(),
+                It.Is<SearchOptions>(options => 
+                    options.Authorization.CanRead("Composition") && !options.Authorization.CanRead("RestrictedType") 
+                )), Times.Once);
+        }
+
+        [Fact]
         public async Task DocumentOperationPOST_OnSuccess_Returns200()
         {
             // Setup Composition resource
