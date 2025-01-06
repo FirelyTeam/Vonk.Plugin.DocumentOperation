@@ -18,7 +18,9 @@ using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Test.Utils;
 using Vonk.Core.ElementModel;
+using Vonk.Core.Model;
 using Vonk.Core.Repository;
+using Vonk.Core.Security;
 using Vonk.UnitTests.Framework.R3;
 using Vonk.UnitTests.Framework.Helpers;
 using Vonk.Fhir.R3;
@@ -34,6 +36,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         private readonly Mock<ISearchRepository> _searchMock = new Mock<ISearchRepository>();
         private readonly Mock<IResourceChangeRepository> _changeMock = new Mock<IResourceChangeRepository>();
         private readonly IStructureDefinitionSummaryProvider _schemaProvider;
+        private readonly Mock<IWriteAuthorizer> _writeAuthorizer = new();
 
         public CustomResourcesInDocumentTests()
         {
@@ -41,7 +44,10 @@ namespace Vonk.Plugin.DocumentOperation.Test
             var customBasicStructureDefinition = new FhirJsonParser().Parse<StructureDefinition>(customBasicStructureDefinitionJson);
 
             _schemaProvider = SchemaProvidersR3.CreateCustomSchemaProvider(customBasicStructureDefinition);
-            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _schemaProvider, _logger);
+            _writeAuthorizer.Setup(w => w.AuthorizeWrite(It.IsAny<IResource>(), It.IsAny<IAuthorization>(),
+                It.IsAny<ICompartment>(), It.IsAny<Uri>())
+            ).Returns(Task.FromResult<AuthorizationResult>(new AuthorizationResult()));
+            _documentService = new DocumentService(_searchMock.Object, _writeAuthorizer.Object, _changeMock.Object, _schemaProvider, _logger);
         }
 
         [Fact]

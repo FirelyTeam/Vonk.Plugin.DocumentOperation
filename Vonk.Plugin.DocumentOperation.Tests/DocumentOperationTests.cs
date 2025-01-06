@@ -17,6 +17,7 @@ using System.Linq;
 using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
+using Vonk.Core.Model;
 using Vonk.Core.Repository;
 using Vonk.Core.Security;
 using Vonk.UnitTests.Framework.Helpers;
@@ -43,10 +44,14 @@ namespace Vonk.Plugin.DocumentOperation.Test
         private Mock<ISearchRepository> _searchMock = new Mock<ISearchRepository>();
         private Mock<IResourceChangeRepository> _changeMock = new Mock<IResourceChangeRepository>();
         private IStructureDefinitionSummaryProvider _schemaProvider = new PocoStructureDefinitionSummaryProvider();
+        private readonly Mock<IWriteAuthorizer> _writeAuthorizer = new();
 
         public DocumentOperationTests()
         {
-            _documentService = new DocumentService(_searchMock.Object, _changeMock.Object, _schemaProvider, _logger);
+            _writeAuthorizer.Setup(w => w.AuthorizeWrite(It.IsAny<IResource>(), It.IsAny<IAuthorization>(),
+                It.IsAny<ICompartment>(), It.IsAny<Uri>())
+            ).Returns(Task.FromResult<AuthorizationResult>(new AuthorizationResult()));
+            _documentService = new DocumentService(_searchMock.Object, _writeAuthorizer.Object, _changeMock.Object, _schemaProvider, _logger);
         }
 
         [Fact]
@@ -186,6 +191,43 @@ namespace Vonk.Plugin.DocumentOperation.Test
                 It.Is<SearchOptions>(options => 
                         options.Authorization.CanRead("Composition") && !options.Authorization.CanRead("RestrictedType") 
                 )), Times.Once);
+        }
+
+        [Fact]
+        public async Task DocumentOperation_WriteIsNotAuthorized_ReturnsForbidden()
+        {
+            // Setup Composition resource
+            var composition = CreateTestCompositionNoReferences();
+            var compositionId = "test";
+            var searchResult = new SearchResult(new List<IResource>() { composition }, 1, 1);
+            _searchMock.Setup(repo => repo.Search(
+                                      It.Is<IArgumentCollection>(args => args.GetArgument(ArgumentNames.resourceId).ArgumentValue == compositionId),
+                                      It.IsAny<SearchOptions>())).ReturnsAsync(searchResult);
+
+            // Create VonkContext for $document (POST / Type level)
+            var testContext = new VonkTestContext(VonkInteraction.instance_custom);
+            testContext.Arguments.AddArguments(new[]
+            {
+                new Argument(ArgumentSource.Path, ArgumentNames.resourceType, "Composition"),
+                new Argument(ArgumentSource.Path, "persist", "true")
+            });
+            testContext.TestRequest.CustomOperation = "document";
+            testContext.TestRequest.Method = "POST";
+
+            var parameters = new Parameters();
+            var idValue = new FhirUri(compositionId);
+            var parameterComponent = new Parameters.ParameterComponent { Name = "id" };
+            parameterComponent.Value = idValue;
+            parameters.Parameter.Add(parameterComponent);
+
+            testContext.TestRequest.Payload = new RequestPayload(true, parameters.ToIResource());
+            _writeAuthorizer.Setup(w => w.AuthorizeWrite(It.IsAny<IResource>(), It.IsAny<IAuthorization>(),
+                It.IsAny<ICompartment>(), It.IsAny<Uri>())
+            ).Returns(Task.FromResult<AuthorizationResult>(new AuthorizationResult("Failed to authorize write")));
+            
+            // Execute $document
+            await _documentService.DocumentTypePOST(testContext);
+            testContext.Response.HttpResult.Should().Be(StatusCodes.Status403Forbidden, "$document should fail with HTTP 403 - Forbidden when write is not authorized");
         }
 
         [Fact]
