@@ -11,6 +11,7 @@ using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
+using Vonk.Core.Security;
 using Vonk.Core.Support;
 using static Vonk.Core.Context.VonkOutcome;
 using Task = System.Threading.Tasks.Task;
@@ -20,19 +21,24 @@ namespace Vonk.Plugin.DocumentOperation
     public class DocumentService
     {
         private readonly ISearchRepository _searchRepository;
+        private readonly IWriteAuthorizer _writeAuthorizer;
         private readonly IResourceChangeRepository _changeRepository;
         private readonly IStructureDefinitionSummaryProvider _schemaProvider;
         private readonly ILogger<DocumentService> _logger;
 
-        public DocumentService(ISearchRepository searchRepository,
+        public DocumentService(ISearchRepository searchRepository, 
+            IWriteAuthorizer writeAuthorizer,
             IResourceChangeRepository changeRepository,
             IStructureDefinitionSummaryProvider schemaProvider,
             ILogger<DocumentService> logger)
         {
             Check.NotNull(searchRepository, nameof(searchRepository));
+            Check.NotNull(writeAuthorizer, nameof(writeAuthorizer));
             Check.NotNull(changeRepository, nameof(changeRepository));
             Check.NotNull(logger, nameof(logger));
+            
             _searchRepository = searchRepository;
+            _writeAuthorizer = writeAuthorizer;
             _changeRepository = changeRepository;
             _schemaProvider = schemaProvider;
             _logger = logger;
@@ -108,7 +114,7 @@ namespace Vonk.Plugin.DocumentOperation
             }
 
             // Handle responses
-            if (!(error is null))
+            if (error is not null)
             {
                 if (!compositionResolved) // Composition resource, on which the operation is called, does not exist
                 {
@@ -139,7 +145,10 @@ namespace Vonk.Plugin.DocumentOperation
             var userRequestedPersistOption = persistArgument == null ? String.Empty : persistArgument.ArgumentValue;
             if (userRequestedPersistOption.Equals("true"))
             {
-                await _changeRepository.Create(documentBundle.ToIResource(vonkContext.InformationModel));
+                var documentBundleResource = documentBundle.ToIResource(vonkContext.InformationModel);
+                if (!await _writeAuthorizer.AuthorizeAndSetResponse(documentBundleResource, vonkContext))
+                    return;
+                await _changeRepository.Create(documentBundleResource);
             }
 
             SendCreatedDocument(vonkContext, documentBundle); // Return newly created document
