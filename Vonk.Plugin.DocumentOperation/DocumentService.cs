@@ -11,6 +11,7 @@ using Vonk.Core.Common;
 using Vonk.Core.Context;
 using Vonk.Core.ElementModel;
 using Vonk.Core.Repository;
+using Vonk.Core.Security;
 using Vonk.Core.Support;
 using static Vonk.Core.Context.VonkOutcome;
 using Task = System.Threading.Tasks.Task;
@@ -260,6 +261,11 @@ namespace Vonk.Plugin.DocumentOperation
                     return (false, null, ReferenceNotResolvedIssue(reference, true));
 
                 return (true, result, null);
+            }
+            catch (VonkAuthorizationException e)
+            {
+                _logger.LogDebug("Authorization failed on $document. Details: {Message}", e.Message);
+                return (false, null, VonkIssue.FORBIDDEN.CloneWithDetails("Operation is forbidden"));
             }
             catch (Exception e)
             {
