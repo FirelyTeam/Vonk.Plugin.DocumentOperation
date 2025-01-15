@@ -265,7 +265,7 @@ namespace Vonk.Plugin.DocumentOperation
             catch (VonkAuthorizationException e)
             {
                 _logger.LogDebug("Authorization failed on $document. Details: {Message}", e.Message);
-                return (false, null, VonkIssue.FORBIDDEN.CloneWithDetails("Operation is forbidden"));
+                return (false, null, VonkIssue.FORBIDDEN.CloneWithDetails("Operation is not allowed with the provided scopes"));
             }
             catch (Exception e)
             {
