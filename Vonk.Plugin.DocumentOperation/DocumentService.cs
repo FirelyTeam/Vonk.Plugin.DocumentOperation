@@ -270,6 +270,11 @@ namespace Vonk.Plugin.DocumentOperation
 
                 return (true, result, null);
             }
+            catch (VonkAuthorizationException e)
+            {
+                _logger.LogDebug("Authorization failed on $document. Details: {Message}", e.Message);
+                return (false, null, VonkIssue.FORBIDDEN.CloneWithDetails("Unable to produce a document with the provided authorization scopes"));
+            }
             catch (Exception e)
             {
                 _logger.LogDebug($"Internal server error occurred while executing $document. Details: {e.Message}");
