@@ -32,7 +32,7 @@ stages:
       dotNetCoreVersion: '8.0.x'
       propsFile: 'Vonk.Plugin.DocumentOperation.props'
       restoreDependencies: true
-      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetServiceConnections: GitHub_FirelyTeams_NuGetFeed
       nuGetSources: --source https://nuget.pkg.github.com/FirelyTeam/index.json
       packageArtifacts: false
       publishArtifacts: false
@@ -42,7 +42,7 @@ stages:
   - template: publish-plugin.yml@templates  # Template reference
     parameters:
       restoreDependencies: true
-      nuGetServiceConnections: VonkPackageCredentials, GitHub_FirelyTeams_NuGetFeed
+      nuGetServiceConnections: GitHub_FirelyTeams_NuGetFeed
       nuGetSources: --source https://nuget.pkg.github.com/FirelyTeam/index.json
       dotNetCoreVersion: '8.0.x'
       pool:
