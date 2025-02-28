@@ -44,6 +44,10 @@ stages:
   - template: publish-plugin.yml@templates  # Template reference
     parameters:
       restoreDependencies: true
+      ${{ if not(startswith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:  # 'normal' build 
+        useVersionSuffix: true
+      ${{ else }}:  # release mode 
+        useVersionSuffix: false
       nuGetServiceConnections: GitHub_FirelyTeams_NuGetFeed
       nuGetSources: --source https://nuget.pkg.github.com/FirelyTeam/index.json
       dotNetCoreVersion: $(DOTNET_CORE_SDK)
