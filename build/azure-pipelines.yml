@@ -1,7 +1,6 @@
 # Repo: FirelyTeam/Vonk.Plugin.DocumentOperation
 # File: build/azure-pipelines.yml
-name: build-$(Date:yyyyMMdd)$(Rev:-r)
-
+name: build-$(Date:yyyyMMdd)$(Rev:.r)
 resources:
   repositories:
     - repository: templates
@@ -9,55 +8,60 @@ resources:
       name: FirelyTeam/azure-pipeline-templates
       endpoint: FirelyTeam
       ref: refs/tags/v1
-      
 
 variables:
-  buildConfiguration: 'Release'
+  - template: variables.yml  
+
+pool: 
+  vmImage: $(vmImage)
 
 trigger:
-  branches:
+  branches: 
     include:
-    - develop*
-    - release*
-
-pr:
-  branches:
-    include: 
-    - develop*
+    - develop
+    - release/*
     - hotfix/*
+    - refs/tags/v*
 
 stages:
 - stage: build
   jobs:
   - template: build.yml@templates  # Template reference
     parameters:
-      dotNetCoreVersion: '8.0.x'
+      dotNetCoreVersion: $(DOTNET_CORE_SDK)
       propsFile: 'Vonk.Plugin.DocumentOperation.props'
-      restoreDependencies: true
+      ${{ if not(startswith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:  # 'normal' build 
+        useVersionSuffix: true
+      ${{ else }}:  # release mode 
+        useVersionSuffix: false
       nuGetServiceConnections: GitHub_FirelyTeams_NuGetFeed
       nuGetSources: --source https://nuget.pkg.github.com/FirelyTeam/index.json
       packageArtifacts: false
       publishArtifacts: false
-      pool:
-        vmImage: windows-latest
-        
+      pool: 
+        vmImage: $(vmImage)
+    
   - template: publish-plugin.yml@templates  # Template reference
     parameters:
       restoreDependencies: true
+      ${{ if not(startswith(variables['Build.SourceBranch'], 'refs/tags/v')) }}:  # 'normal' build 
+        useVersionSuffix: true
+      ${{ else }}:  # release mode 
+        useVersionSuffix: false
       nuGetServiceConnections: GitHub_FirelyTeams_NuGetFeed
       nuGetSources: --source https://nuget.pkg.github.com/FirelyTeam/index.json
-      dotNetCoreVersion: '8.0.x'
+      dotNetCoreVersion: $(DOTNET_CORE_SDK)
       pool:
-         vmImage: windows-latest
-
+          vmImage: $(vmImage)
 
 - stage: deploy
   dependsOn: build
+  displayName: Deploy
+  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # not a PR
   jobs:
   - template: deploy-plugin.yml@templates
     parameters:
-      packageName: vonk.plugin.documentoperation
-      packageDescription: 'Vonk Plugin implementing FHIR `$document` operation'      
+      packageName: 'vonk.plugin.documentoperation'
+      packageDescription: 'Vonk Plugin implementing FHIR `$document` operation'
       pool:
-        vmImage: windows-latest      
-      
+        vmImage: $(vmImage)            
