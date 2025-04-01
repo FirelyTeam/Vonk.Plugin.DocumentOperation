@@ -79,8 +79,8 @@ namespace Vonk.UnitTests.Framework.R3
         public CustomResolverR3(Dictionary<string, Resource> customSds)
         {
             var contentRootPath = Directory.GetCurrentDirectory();
-            var specificationZipLocator = new SpecificationZipLocator(contentRootPath, Logger<SpecificationZipLocator>());
-            var zipLocation = specificationZipLocator.FindSpecificationZip(VonkConstants.Model.FhirR3);
+            var zipLocation = Directory.EnumerateFiles(contentRootPath, "specification*r3*.zip", SearchOption.AllDirectories)
+                .Single();
             _coreResolver = new CachedResolver(new ZipSource(zipLocation));
 
             _customSds = customSds;
