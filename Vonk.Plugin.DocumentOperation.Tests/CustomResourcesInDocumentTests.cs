@@ -26,6 +26,7 @@ using Vonk.UnitTests.Framework.Helpers;
 using Vonk.Fhir.R3;
 using static Vonk.UnitTests.Framework.Helpers.LoggerUtils;
 using Task = System.Threading.Tasks.Task;
+using static @base::Hl7.Fhir.Serialization.PocoDeserializationExtensions;
 
 namespace Vonk.Plugin.DocumentOperation.Test
 {
@@ -41,7 +42,7 @@ namespace Vonk.Plugin.DocumentOperation.Test
         public CustomResourcesInDocumentTests()
         {
             var customBasicStructureDefinitionJson = TestResourceReader.ReadTestData("CustomBasic-StructureDefinition-R3.json");
-            var customBasicStructureDefinition = new FhirJsonParser().Parse<StructureDefinition>(customBasicStructureDefinitionJson);
+            var customBasicStructureDefinition = new FhirJsonDeserializer().Deserialize<StructureDefinition>(customBasicStructureDefinitionJson);
 
             _schemaProvider = SchemaProvidersR3.CreateCustomSchemaProvider(customBasicStructureDefinition);
             _writeAuthorizer.Setup(w => w.AuthorizeWrite(It.IsAny<IResource>(), It.IsAny<IAuthorization>(),

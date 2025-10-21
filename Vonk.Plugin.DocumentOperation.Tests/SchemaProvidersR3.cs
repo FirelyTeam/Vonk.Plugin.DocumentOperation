@@ -99,7 +99,7 @@ namespace Vonk.UnitTests.Framework.R3
 
         public Resource ResolveByUri(string uri)
         {
-            return _coreResolver.ResolveByUri(uri);
+            return _coreResolver.TryResolveByUri(uri).Value;
         }
 
         public Resource ResolveByCanonicalUri(string uri)
@@ -107,7 +107,7 @@ namespace Vonk.UnitTests.Framework.R3
             if (_customSds.HasAny() && _customSds.TryGetValue(uri, out var customSd))
                 return customSd;
 
-            return _coreResolver.ResolveByCanonicalUri(uri);
+            return _coreResolver.TryResolveByCanonicalUri(uri).Value;
         }
     }
 }
