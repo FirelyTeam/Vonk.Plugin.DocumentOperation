@@ -6,13 +6,13 @@
     <VersionSuffix></VersionSuffix>
     <Authors>Firely - Alexander Zautke, Christiaan Knaap, Marco Visser</Authors>
     <Company>Firely (https://fire.ly)</Company>
-    <Copyright>Copyright 2013-2019 Firely</Copyright>
+    <Copyright>Copyright 2013-2025 Firely</Copyright>
     <RepositoryType>git</RepositoryType>
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
-    <VonkVersion>6.5.0-alpha-build-20251021.8</VonkVersion>
+    <VonkVersion>6.5.0</VonkVersion>
     <FhirNetApiVersion>6.*</FhirNetApiVersion>
   </PropertyGroup>
   
