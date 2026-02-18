@@ -7,6 +7,11 @@ updates:
     time: "04:00"
   open-pull-requests-limit: 10
   target-branch: develop
+  groups:
+    minor-and-patch:
+      update-types:
+        - "minor"
+        - "patch"
   ignore:
   - dependency-name: Hl7.Fhir.Specification.STU3
     versions:
