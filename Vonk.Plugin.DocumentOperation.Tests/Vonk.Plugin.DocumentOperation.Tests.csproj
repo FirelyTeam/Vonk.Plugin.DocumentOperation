@@ -14,7 +14,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Moq" Version="4.20.72" />
-    <PackageReference Include="FluentAssertions" Version="6.12.2" />
+    <PackageReference Include="FluentAssertions" Version="7.2.2" />
     <PackageReference Include="Vonk.Fhir.R3" Version="$(VonkVersion)" />
     <PackageReference Include="Hl7.Fhir.STU3" Version="$(FhirNetApiVersion)" />
     <PackageReference Include="Hl7.Fhir.Specification.Data.STU3" Version="$(FhirNetApiVersion)" GeneratePathProperty="true" ExcludeAssets="contentFiles" />
