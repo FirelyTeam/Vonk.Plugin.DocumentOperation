@@ -5,4 +5,4 @@
 variables:
   buildConfiguration: 'Release'
   vmImage: 'windows-latest'
-  DOTNET_CORE_SDK: '8.0.x'
+  DOTNET_CORE_SDK: '10.0.x'
