@@ -17,6 +17,7 @@
     <PackageReference Include="FluentAssertions" Version="7.2.2" />
     <PackageReference Include="Vonk.Fhir.R3" Version="$(VonkVersion)" />
     <PackageReference Include="Hl7.Fhir.STU3" Version="$(FhirNetApiVersion)" />
+    <PackageReference Include="Hl7.Fhir.R4" Version="$(FhirNetApiVersion)" />
     <PackageReference Include="Hl7.Fhir.Specification.Data.STU3" Version="$(FhirNetApiVersion)" GeneratePathProperty="true" ExcludeAssets="contentFiles" />
   </ItemGroup>
 
@@ -36,6 +37,9 @@
       </ReferencePath>
       <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.Base'">
         <Aliases>base</Aliases>
+      </ReferencePath>
+      <ReferencePath Condition="'%(FileName)'=='Hl7.Fhir.R4'">
+        <Aliases>r4</Aliases>
       </ReferencePath>
     </ItemGroup>
   </Target>
